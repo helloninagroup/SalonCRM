@@ -11,6 +11,7 @@ SalonCRM is an all-in-one salon management system designed to simplify daily ope
 - **Client Management**: Store detailed client profiles, preferences, and visit histories.
 - **Point of Sale (POS)**: Streamline payments with integrated POS functionality and flexible billing options.
 - **Inventory Management**: Track salon product stock levels in real-time.
+- and many many more
 
 ### Advanced Capabilities
 - **Analytics Dashboard**: Access insights on revenue, customer trends, and employee performance.
@@ -57,9 +58,11 @@ We welcome contributions! Here's how you can help:
 
 # Fork the repository.
 Create a feature branch:
+
 `
 git checkout -b feature/your-feature-name
 `
+
 Commit your changes:
 
 ` 
@@ -74,7 +77,7 @@ git push origin feature/your-feature-name
 
 
 #  Support 📞
-If you encounter any issues or have questions, feel free to open an issue or contact us directly via email at support@saloncrm.com.
+If you encounter any issues or have questions, feel free to open an issue or contact us directly via email at support@2tinteractive.com
 
 #  Acknowledgments ❤️
 
