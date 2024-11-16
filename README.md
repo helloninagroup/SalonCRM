@@ -4,6 +4,15 @@ SalonCRM is an all-in-one salon management system designed to simplify daily ope
 
 ---
 
+![Dashboard](Dashboard.png)
+![Appointments](appointments_module.png)
+![Clients Portal](clients_portal.png)
+![Business WhatsApp API Integration](whatsapp_integration.png)
+![Billing & Invoicing Module](billing_invoicing.png)
+![POS module](POS_module.png)
+
+---
+
 ## 🚀 Features
 
 ### Core Features
