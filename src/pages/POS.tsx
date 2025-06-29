@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Minus, ShoppingCart, CreditCard, DollarSign, Receipt } from 'lucide-react';
+import { Plus, Minus, ShoppingCart, CreditCard, DollarSign, Receipt, User, Percent } from 'lucide-react';
 import InvoiceModal from '../components/InvoiceModal';
 
 const services = [
@@ -29,6 +29,15 @@ const clients = [
   { value: 'anna', label: 'Anna Johnson' },
 ];
 
+// Daftar karyawan dengan komisi default
+const employees = [
+  { id: 1, name: 'Sarah Johnson', position: 'Senior Stylist', defaultCommission: 12 },
+  { id: 2, name: 'Maria Santos', position: 'Hair Colorist', defaultCommission: 10 },
+  { id: 3, name: 'Jake Wilson', position: 'Barber', defaultCommission: 8 },
+  { id: 4, name: 'Lisa Chen', position: 'Nail Technician', defaultCommission: 10 },
+  { id: 5, name: 'Ahmad Rahman', position: 'Junior Stylist', defaultCommission: 6 },
+];
+
 interface CartItem {
   id: string;
   name: string;
@@ -41,6 +50,8 @@ export default function POS() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeTab, setActiveTab] = useState<'services' | 'products'>('services');
   const [selectedClient, setSelectedClient] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState(employees[0].id.toString());
+  const [commissionRate, setCommissionRate] = useState(employees[0].defaultCommission);
   const [showInvoice, setShowInvoice] = useState(false);
 
   const addToCart = (item: typeof services[0] | typeof products[0], type: 'service' | 'product') => {
@@ -74,13 +85,35 @@ export default function POS() {
     }
   };
 
+  const handleEmployeeChange = (employeeId: string) => {
+    setSelectedEmployee(employeeId);
+    const employee = employees.find(emp => emp.id.toString() === employeeId);
+    if (employee) {
+      setCommissionRate(employee.defaultCommission);
+    }
+  };
+
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.05; // 5% tax
   const total = subtotal + tax;
+  const commissionAmount = (total * commissionRate) / 100;
 
   const handleCheckout = () => {
-    // Handle checkout logic
-    alert('Checkout selesai!');
+    const selectedEmp = employees.find(emp => emp.id.toString() === selectedEmployee);
+    const clientName = getClientName();
+    
+    const transactionSummary = `
+Transaksi berhasil!
+
+Pelanggan: ${clientName}
+Karyawan: ${selectedEmp?.name} (${selectedEmp?.position})
+Total Transaksi: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total)}
+Komisi (${commissionRate}%): ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(commissionAmount)}
+
+Komisi akan ditambahkan ke akun karyawan.
+    `;
+    
+    alert(transactionSummary);
     setCart([]);
   };
 
@@ -95,6 +128,11 @@ export default function POS() {
   const getClientName = () => {
     const client = clients.find(c => c.value === selectedClient);
     return client ? client.label : 'Pelanggan Walk-in';
+  };
+
+  const getEmployeeName = () => {
+    const employee = employees.find(emp => emp.id.toString() === selectedEmployee);
+    return employee ? employee.name : '';
   };
 
   return (
@@ -193,6 +231,45 @@ export default function POS() {
               <ShoppingCart className="h-5 w-5 text-gray-400" />
             </div>
 
+            {/* Employee Selection */}
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <User className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-900">Karyawan yang Melayani</span>
+              </div>
+              <select
+                value={selectedEmployee}
+                onChange={(e) => handleEmployeeChange(e.target.value)}
+                className="input text-sm"
+              >
+                {employees.map(employee => (
+                  <option key={employee.id} value={employee.id.toString()}>
+                    {employee.name} - {employee.position}
+                  </option>
+                ))}
+              </select>
+              
+              {/* Commission Rate */}
+              <div className="mt-2 flex items-center justify-between">
+                <div className="flex items-center space-x-1">
+                  <Percent className="h-3 w-3 text-blue-600" />
+                  <span className="text-xs text-blue-700">Komisi:</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    value={commissionRate}
+                    onChange={(e) => setCommissionRate(Math.max(0, Math.min(50, parseFloat(e.target.value) || 0)))}
+                    className="w-16 px-2 py-1 text-xs border border-blue-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    min="0"
+                    max="50"
+                    step="0.5"
+                  />
+                  <span className="text-xs text-blue-700">%</span>
+                </div>
+              </div>
+            </div>
+
             {cart.length === 0 ? (
               <div className="text-center text-gray-500 py-8">
                 <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
@@ -245,6 +322,14 @@ export default function POS() {
                     <span>Total:</span>
                     <span>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total)}</span>
                   </div>
+                  
+                  {/* Commission Display */}
+                  <div className="flex justify-between text-sm bg-green-50 p-2 rounded-md border border-green-200">
+                    <span className="text-green-700 font-medium">Komisi ({commissionRate}%):</span>
+                    <span className="font-bold text-green-800">
+                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(commissionAmount)}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="mt-6 space-y-3">
@@ -281,6 +366,9 @@ export default function POS() {
         onClose={() => setShowInvoice(false)}
         cart={cart}
         clientName={getClientName()}
+        employeeName={getEmployeeName()}
+        commissionRate={commissionRate}
+        commissionAmount={commissionAmount}
         subtotal={subtotal}
         tax={tax}
         total={total}

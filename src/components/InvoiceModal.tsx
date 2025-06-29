@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Printer } from 'lucide-react';
+import { X, Printer, User, Percent } from 'lucide-react';
 
 interface CartItem {
   id: string;
@@ -14,6 +14,9 @@ interface InvoiceModalProps {
   onClose: () => void;
   cart: CartItem[];
   clientName?: string;
+  employeeName?: string;
+  commissionRate?: number;
+  commissionAmount?: number;
   subtotal: number;
   tax: number;
   total: number;
@@ -24,6 +27,9 @@ export default function InvoiceModal({
   onClose, 
   cart, 
   clientName = 'Pelanggan Walk-in',
+  employeeName = '',
+  commissionRate = 0,
+  commissionAmount = 0,
   subtotal,
   tax,
   total 
@@ -67,6 +73,7 @@ export default function InvoiceModal({
                 .flex { display: flex; }
                 .justify-between { justify-content: space-between; }
                 .logo { width: 60px; height: 60px; margin: 0 auto 10px; }
+                .commission-info { background-color: #f0f9ff; padding: 8px; margin: 10px 0; border: 1px solid #e0f2fe; }
                 @media print {
                   body { margin: 0; }
                   .invoice-container { border: none; }
@@ -148,6 +155,23 @@ export default function InvoiceModal({
               <p className="text-sm text-gray-600">{clientName}</p>
             </div>
 
+            {/* Employee Info */}
+            {employeeName && (
+              <div className="commission-info text-center mb-4">
+                <div className="flex items-center justify-center space-x-1 mb-1">
+                  <User className="h-3 w-3" />
+                  <span className="text-xs font-bold">Dilayani oleh:</span>
+                </div>
+                <p className="text-sm font-medium">{employeeName}</p>
+                {commissionRate > 0 && (
+                  <div className="flex items-center justify-center space-x-1 mt-1">
+                    <Percent className="h-3 w-3" />
+                    <span className="text-xs">Komisi {commissionRate}%: {commissionAmount.toLocaleString('id-ID')}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Items */}
             <div className="mb-4">
               {cart.map((item, index) => (
@@ -181,6 +205,20 @@ export default function InvoiceModal({
                 <span>{Math.round(total + (subtotal * 0.05)).toLocaleString('id-ID')}</span>
               </div>
             </div>
+
+            {/* Commission Summary for Internal Use */}
+            {employeeName && commissionRate > 0 && (
+              <div className="commission-info mt-4">
+                <div className="text-center">
+                  <p className="text-xs font-bold mb-1">INFORMASI KOMISI</p>
+                  <p className="text-xs">Karyawan: {employeeName}</p>
+                  <p className="text-xs">Rate: {commissionRate}%</p>
+                  <p className="text-xs font-bold">
+                    Jumlah: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(commissionAmount)}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Footer */}
             <div className="text-center mt-6 text-xs text-gray-500">
