@@ -21,7 +21,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search clients, appointments..."
+              placeholder="Cari klien, janji temu..."
               className="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>

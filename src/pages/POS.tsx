@@ -3,22 +3,22 @@ import { Plus, Minus, ShoppingCart, CreditCard, DollarSign, Receipt } from 'luci
 import InvoiceModal from '../components/InvoiceModal';
 
 const services = [
-  { id: 1, name: 'Hair Cut', price: 45, category: 'Hair' },
-  { id: 2, name: 'Hair Wash & Blow Dry', price: 35, category: 'Hair' },
-  { id: 3, name: 'Hair Color', price: 120, category: 'Hair' },
-  { id: 4, name: 'Highlights', price: 150, category: 'Hair' },
-  { id: 5, name: 'Beard Trim', price: 25, category: 'Grooming' },
-  { id: 6, name: 'Manicure', price: 40, category: 'Nails' },
-  { id: 7, name: 'Pedicure', price: 50, category: 'Nails' },
-  { id: 8, name: 'Facial Treatment', price: 80, category: 'Skincare' },
+  { id: 1, name: 'Potong Rambut', price: 450000, category: 'Rambut' },
+  { id: 2, name: 'Cuci & Blow Rambut', price: 350000, category: 'Rambut' },
+  { id: 3, name: 'Pewarnaan Rambut', price: 1200000, category: 'Rambut' },
+  { id: 4, name: 'Highlight', price: 1500000, category: 'Rambut' },
+  { id: 5, name: 'Cukur Jenggot', price: 250000, category: 'Perawatan' },
+  { id: 6, name: 'Manikur', price: 400000, category: 'Kuku' },
+  { id: 7, name: 'Pedikur', price: 500000, category: 'Kuku' },
+  { id: 8, name: 'Perawatan Wajah', price: 800000, category: 'Perawatan Kulit' },
 ];
 
 const products = [
-  { id: 1, name: 'Shampoo Premium', price: 28, stock: 15, category: 'Hair Care' },
-  { id: 2, name: 'Conditioner', price: 25, stock: 12, category: 'Hair Care' },
-  { id: 3, name: 'Hair Serum', price: 35, stock: 8, category: 'Hair Care' },
-  { id: 4, name: 'Nail Polish', price: 15, stock: 25, category: 'Nails' },
-  { id: 5, name: 'Face Mask', price: 22, stock: 10, category: 'Skincare' },
+  { id: 1, name: 'Sampo Premium', price: 280000, stock: 15, category: 'Perawatan Rambut' },
+  { id: 2, name: 'Kondisioner', price: 250000, stock: 12, category: 'Perawatan Rambut' },
+  { id: 3, name: 'Serum Rambut', price: 350000, stock: 8, category: 'Perawatan Rambut' },
+  { id: 4, name: 'Cat Kuku', price: 150000, stock: 25, category: 'Kuku' },
+  { id: 5, name: 'Masker Wajah', price: 220000, stock: 10, category: 'Perawatan Kulit' },
 ];
 
 const clients = [
@@ -75,18 +75,18 @@ export default function POS() {
   };
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const tax = subtotal * 0.08; // 8% tax
+  const tax = subtotal * 0.05; // 5% tax
   const total = subtotal + tax;
 
   const handleCheckout = () => {
     // Handle checkout logic
-    alert('Checkout completed!');
+    alert('Checkout selesai!');
     setCart([]);
   };
 
   const handleShowInvoice = () => {
     if (cart.length === 0) {
-      alert('Cart is empty. Add items to generate invoice.');
+      alert('Keranjang kosong. Tambahkan item untuk membuat faktur.');
       return;
     }
     setShowInvoice(true);
@@ -94,20 +94,20 @@ export default function POS() {
 
   const getClientName = () => {
     const client = clients.find(c => c.value === selectedClient);
-    return client ? client.label : 'Walk-in Customer';
+    return client ? client.label : 'Pelanggan Walk-in';
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Point of Sale</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Titik Penjualan</h1>
         <div className="flex items-center space-x-4">
           <select
             value={selectedClient}
             onChange={(e) => setSelectedClient(e.target.value)}
             className="input"
           >
-            <option value="">Select Client</option>
+            <option value="">Pilih Pelanggan</option>
             {clients.map(client => (
               <option key={client.value} value={client.value}>{client.label}</option>
             ))}
@@ -128,7 +128,7 @@ export default function POS() {
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Services
+                Layanan
               </button>
               <button
                 onClick={() => setActiveTab('products')}
@@ -138,7 +138,7 @@ export default function POS() {
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Products
+                Produk
               </button>
             </div>
 
@@ -155,7 +155,9 @@ export default function POS() {
                         <h3 className="font-medium text-gray-900">{service.name}</h3>
                         <p className="text-sm text-gray-600">{service.category}</p>
                       </div>
-                      <span className="text-lg font-bold text-primary-600">${service.price}</span>
+                      <span className="text-lg font-bold text-primary-600">
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(service.price)}
+                      </span>
                     </div>
                   </div>
                 ))
@@ -170,9 +172,11 @@ export default function POS() {
                       <div>
                         <h3 className="font-medium text-gray-900">{product.name}</h3>
                         <p className="text-sm text-gray-600">{product.category}</p>
-                        <p className="text-xs text-gray-500">Stock: {product.stock}</p>
+                        <p className="text-xs text-gray-500">Stok: {product.stock}</p>
                       </div>
-                      <span className="text-lg font-bold text-primary-600">${product.price}</span>
+                      <span className="text-lg font-bold text-primary-600">
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(product.price)}
+                      </span>
                     </div>
                   </div>
                 ))
@@ -185,14 +189,14 @@ export default function POS() {
         <div className="lg:col-span-1">
           <div className="card">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Cart</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Keranjang</h2>
               <ShoppingCart className="h-5 w-5 text-gray-400" />
             </div>
 
             {cart.length === 0 ? (
               <div className="text-center text-gray-500 py-8">
                 <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Cart is empty</p>
+                <p>Keranjang kosong</p>
               </div>
             ) : (
               <>
@@ -201,7 +205,9 @@ export default function POS() {
                     <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{item.name}</h4>
-                        <p className="text-sm text-gray-600">${item.price} each</p>
+                        <p className="text-sm text-gray-600">
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.price)} per item
+                        </p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <button
@@ -225,15 +231,19 @@ export default function POS() {
                 <div className="border-t border-gray-200 pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal:</span>
-                    <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    <span className="font-medium">
+                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(subtotal)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tax (8%):</span>
-                    <span className="font-medium">${tax.toFixed(2)}</span>
+                    <span className="text-gray-600">Pajak (5%):</span>
+                    <span className="font-medium">
+                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-2">
                     <span>Total:</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total)}</span>
                   </div>
                 </div>
 
@@ -243,19 +253,19 @@ export default function POS() {
                     className="w-full btn-primary"
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Process Payment
+                    Proses Pembayaran
                   </button>
                   <div className="grid grid-cols-2 gap-2">
                     <button className="btn-secondary text-sm">
                       <DollarSign className="h-4 w-4 mr-1" />
-                      Cash
+                      Tunai
                     </button>
                     <button 
                       onClick={handleShowInvoice}
                       className="btn-secondary text-sm"
                     >
                       <Receipt className="h-4 w-4 mr-1" />
-                      Invoice
+                      Faktur
                     </button>
                   </div>
                 </div>

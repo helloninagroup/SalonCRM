@@ -23,7 +23,7 @@ export default function InvoiceModal({
   isOpen, 
   onClose, 
   cart, 
-  clientName = 'Walk-in Customer',
+  clientName = 'Pelanggan Walk-in',
   subtotal,
   tax,
   total 
@@ -42,7 +42,7 @@ export default function InvoiceModal({
         printWindow.document.write(`
           <html>
             <head>
-              <title>Invoice - ${invoiceNumber}</title>
+              <title>Faktur - ${invoiceNumber}</title>
               <style>
                 body { 
                   font-family: 'Courier New', monospace; 
@@ -95,12 +95,12 @@ export default function InvoiceModal({
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">Invoice</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Faktur</h2>
           <div className="flex items-center space-x-2">
             <button
               onClick={handlePrint}
               className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
-              title="Print Invoice"
+              title="Cetak Faktur"
             >
               <Printer className="h-5 w-5" />
             </button>
@@ -172,7 +172,7 @@ export default function InvoiceModal({
                 <span className="text-sm">{Math.round(subtotal * 0.05).toLocaleString('id-ID')}</span>
               </div>
               <div className="flex justify-between mb-4">
-                <span className="text-sm">Pajak (8%)</span>
+                <span className="text-sm">Pajak (5%)</span>
                 <span className="text-sm">{Math.round(tax).toLocaleString('id-ID')}</span>
               </div>
               
@@ -197,13 +197,13 @@ export default function InvoiceModal({
             className="flex-1 btn-primary"
           >
             <Printer className="h-4 w-4 mr-2" />
-            Print Invoice
+            Cetak Faktur
           </button>
           <button
             onClick={onClose}
             className="flex-1 btn-secondary"
           >
-            Close
+            Tutup
           </button>
         </div>
       </div>

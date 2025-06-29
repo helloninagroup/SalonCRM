@@ -4,99 +4,99 @@ import { Plus, Search, Filter, Package, AlertTriangle, TrendingUp, TrendingDown 
 const inventory = [
   {
     id: 1,
-    name: 'Premium Shampoo',
-    category: 'Hair Care',
+    name: 'Sampo Premium',
+    category: 'Perawatan Rambut',
     stock: 15,
     minStock: 10,
-    price: 28,
-    cost: 18,
+    price: 280000,
+    cost: 180000,
     supplier: 'Beauty Supply Co.',
     lastRestocked: '2024-01-10',
-    status: 'in-stock'
+    status: 'tersedia'
   },
   {
     id: 2,
-    name: 'Organic Conditioner',
-    category: 'Hair Care',
+    name: 'Kondisioner Organik',
+    category: 'Perawatan Rambut',
     stock: 8,
     minStock: 10,
-    price: 25,
-    cost: 15,
+    price: 250000,
+    cost: 150000,
     supplier: 'Natural Beauty Ltd.',
     lastRestocked: '2024-01-05',
-    status: 'low-stock'
+    status: 'stok rendah'
   },
   {
     id: 3,
-    name: 'Hair Styling Gel',
-    category: 'Styling',
+    name: 'Gel Penata Rambut',
+    category: 'Penataan',
     stock: 25,
     minStock: 15,
-    price: 22,
-    cost: 12,
+    price: 220000,
+    cost: 120000,
     supplier: 'Style Pro Inc.',
     lastRestocked: '2024-01-12',
-    status: 'in-stock'
+    status: 'tersedia'
   },
   {
     id: 4,
-    name: 'Nail Polish Set',
-    category: 'Nails',
+    name: 'Set Cat Kuku',
+    category: 'Kuku',
     stock: 3,
     minStock: 5,
-    price: 45,
-    cost: 25,
+    price: 450000,
+    cost: 250000,
     supplier: 'Nail Art Supplies',
     lastRestocked: '2023-12-28',
-    status: 'low-stock'
+    status: 'stok rendah'
   },
   {
     id: 5,
-    name: 'Face Moisturizer',
-    category: 'Skincare',
+    name: 'Pelembab Wajah',
+    category: 'Perawatan Kulit',
     stock: 0,
     minStock: 8,
-    price: 35,
-    cost: 20,
+    price: 350000,
+    cost: 200000,
     supplier: 'Skincare Solutions',
     lastRestocked: '2023-12-15',
-    status: 'out-of-stock'
+    status: 'stok habis'
   },
   {
     id: 6,
-    name: 'Hair Serum',
-    category: 'Hair Care',
+    name: 'Serum Rambut',
+    category: 'Perawatan Rambut',
     stock: 12,
     minStock: 8,
-    price: 35,
-    cost: 22,
+    price: 350000,
+    cost: 220000,
     supplier: 'Beauty Supply Co.',
     lastRestocked: '2024-01-08',
-    status: 'in-stock'
+    status: 'tersedia'
   }
 ];
 
-const categories = ['All', 'Hair Care', 'Styling', 'Nails', 'Skincare'];
+const categories = ['Semua', 'Perawatan Rambut', 'Penataan', 'Kuku', 'Perawatan Kulit'];
 
 export default function Inventory() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [sortBy, setSortBy] = useState('name');
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'in-stock': return 'bg-green-100 text-green-800';
-      case 'low-stock': return 'bg-yellow-100 text-yellow-800';
-      case 'out-of-stock': return 'bg-red-100 text-red-800';
+      case 'tersedia': return 'bg-green-100 text-green-800';
+      case 'stok rendah': return 'bg-yellow-100 text-yellow-800';
+      case 'stok habis': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'in-stock': return <TrendingUp className="h-4 w-4" />;
-      case 'low-stock': return <AlertTriangle className="h-4 w-4" />;
-      case 'out-of-stock': return <TrendingDown className="h-4 w-4" />;
+      case 'tersedia': return <TrendingUp className="h-4 w-4" />;
+      case 'stok rendah': return <AlertTriangle className="h-4 w-4" />;
+      case 'stok habis': return <TrendingDown className="h-4 w-4" />;
       default: return <Package className="h-4 w-4" />;
     }
   };
@@ -104,7 +104,7 @@ export default function Inventory() {
   const filteredInventory = inventory
     .filter(item => 
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedCategory === 'All' || item.category === selectedCategory)
+      (selectedCategory === 'Semua' || item.category === selectedCategory)
     )
     .sort((a, b) => {
       switch (sortBy) {
@@ -116,17 +116,17 @@ export default function Inventory() {
     });
 
   const totalItems = inventory.length;
-  const lowStockItems = inventory.filter(item => item.status === 'low-stock').length;
-  const outOfStockItems = inventory.filter(item => item.status === 'out-of-stock').length;
+  const lowStockItems = inventory.filter(item => item.status === 'stok rendah').length;
+  const outOfStockItems = inventory.filter(item => item.status === 'stok habis').length;
   const totalValue = inventory.reduce((sum, item) => sum + (item.stock * item.cost), 0);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Inventory Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Manajemen Inventaris</h1>
         <button className="btn-primary">
           <Plus className="h-4 w-4 mr-2" />
-          Add Product
+          Tambah Produk
         </button>
       </div>
 
@@ -135,7 +135,7 @@ export default function Inventory() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Items</p>
+              <p className="text-sm font-medium text-gray-600">Total Item</p>
               <p className="text-2xl font-bold text-gray-900">{totalItems}</p>
             </div>
             <Package className="h-8 w-8 text-primary-600" />
@@ -145,7 +145,7 @@ export default function Inventory() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Low Stock</p>
+              <p className="text-sm font-medium text-gray-600">Stok Rendah</p>
               <p className="text-2xl font-bold text-yellow-600">{lowStockItems}</p>
             </div>
             <AlertTriangle className="h-8 w-8 text-yellow-600" />
@@ -155,7 +155,7 @@ export default function Inventory() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Out of Stock</p>
+              <p className="text-sm font-medium text-gray-600">Stok Habis</p>
               <p className="text-2xl font-bold text-red-600">{outOfStockItems}</p>
             </div>
             <TrendingDown className="h-8 w-8 text-red-600" />
@@ -165,8 +165,10 @@ export default function Inventory() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Value</p>
-              <p className="text-2xl font-bold text-gray-900">${totalValue.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-600">Total Nilai</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalValue)}
+              </p>
             </div>
             <TrendingUp className="h-8 w-8 text-green-600" />
           </div>
@@ -179,7 +181,7 @@ export default function Inventory() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Cari produk..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="input pl-10"
@@ -201,10 +203,10 @@ export default function Inventory() {
           onChange={(e) => setSortBy(e.target.value)}
           className="input"
         >
-          <option value="name">Sort by Name</option>
-          <option value="stock">Sort by Stock</option>
-          <option value="price">Sort by Price</option>
-          <option value="status">Sort by Status</option>
+          <option value="name">Urutkan berdasarkan Nama</option>
+          <option value="stock">Urutkan berdasarkan Stok</option>
+          <option value="price">Urutkan berdasarkan Harga</option>
+          <option value="status">Urutkan berdasarkan Status</option>
         </select>
       </div>
 
@@ -215,25 +217,25 @@ export default function Inventory() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Product
+                  Produk
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
+                  Kategori
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stock
+                  Stok
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
+                  Harga
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Supplier
+                  Pemasok
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Tindakan
                 </th>
               </tr>
             </thead>
@@ -243,24 +245,30 @@ export default function Inventory() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                      <div className="text-sm text-gray-500">Last restocked: {item.lastRestocked}</div>
+                      <div className="text-sm text-gray-500">
+                        Terakhir distok ulang: {new Date(item.lastRestocked).toLocaleDateString('id-ID')}
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {item.category}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{item.stock} units</div>
+                    <div className="text-sm text-gray-900">{item.stock} unit</div>
                     <div className="text-xs text-gray-500">Min: {item.minStock}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">${item.price}</div>
-                    <div className="text-xs text-gray-500">Cost: ${item.cost}</div>
+                    <div className="text-sm text-gray-900">
+                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.price)}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Biaya: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.cost)}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
                       {getStatusIcon(item.status)}
-                      <span className="ml-1 capitalize">{item.status.replace('-', ' ')}</span>
+                      <span className="ml-1 capitalize">{item.status}</span>
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -272,7 +280,7 @@ export default function Inventory() {
                         Edit
                       </button>
                       <button className="text-green-600 hover:text-green-900">
-                        Restock
+                        Restok
                       </button>
                     </div>
                   </td>

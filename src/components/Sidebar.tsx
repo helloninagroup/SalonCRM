@@ -17,12 +17,12 @@ interface SidebarProps {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Appointments', href: '/appointments', icon: Calendar },
-  { name: 'Clients', href: '/clients', icon: Users },
-  { name: 'Point of Sale', href: '/pos', icon: ShoppingCart },
-  { name: 'Inventory', href: '/inventory', icon: Package },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Dasbor', href: '/', icon: LayoutDashboard },
+  { name: 'Janji Temu', href: '/appointments', icon: Calendar },
+  { name: 'Klien', href: '/clients', icon: Users },
+  { name: 'Titik Penjualan', href: '/pos', icon: ShoppingCart },
+  { name: 'Inventaris', href: '/inventory', icon: Package },
+  { name: 'Analitik', href: '/analytics', icon: BarChart3 },
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {

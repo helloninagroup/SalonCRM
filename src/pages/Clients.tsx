@@ -6,61 +6,61 @@ const clients = [
     id: 1,
     name: 'Emma Wilson',
     email: 'emma.wilson@email.com',
-    phone: '+1 (555) 123-4567',
+    phone: '+62 812-3456-7890',
     lastVisit: '2024-01-15',
     totalVisits: 12,
-    totalSpent: 1240,
+    totalSpent: 1240000,
     preferredStylist: 'Sarah',
     rating: 5,
-    notes: 'Prefers natural hair colors, allergic to sulfates'
+    notes: 'Lebih suka warna rambut natural, alergi sulfat'
   },
   {
     id: 2,
     name: 'Michael Brown',
     email: 'michael.brown@email.com',
-    phone: '+1 (555) 234-5678',
+    phone: '+62 813-4567-8901',
     lastVisit: '2024-01-10',
     totalVisits: 8,
-    totalSpent: 680,
+    totalSpent: 680000,
     preferredStylist: 'Jake',
     rating: 4,
-    notes: 'Regular beard maintenance, prefers short cuts'
+    notes: 'Perawatan jenggot rutin, suka potongan pendek'
   },
   {
     id: 3,
     name: 'Lisa Davis',
     email: 'lisa.davis@email.com',
-    phone: '+1 (555) 345-6789',
+    phone: '+62 814-5678-9012',
     lastVisit: '2024-01-12',
     totalVisits: 15,
-    totalSpent: 2100,
+    totalSpent: 2100000,
     preferredStylist: 'Maria',
     rating: 5,
-    notes: 'Loves bold colors, frequent highlights'
+    notes: 'Suka warna berani, sering highlight'
   },
   {
     id: 4,
     name: 'John Smith',
     email: 'john.smith@email.com',
-    phone: '+1 (555) 456-7890',
+    phone: '+62 815-6789-0123',
     lastVisit: '2024-01-08',
     totalVisits: 6,
-    totalSpent: 420,
+    totalSpent: 420000,
     preferredStylist: 'Sarah',
     rating: 4,
-    notes: 'Business professional, classic styles'
+    notes: 'Profesional bisnis, gaya klasik'
   },
   {
     id: 5,
     name: 'Anna Johnson',
     email: 'anna.johnson@email.com',
-    phone: '+1 (555) 567-8901',
+    phone: '+62 816-7890-1234',
     lastVisit: '2024-01-14',
     totalVisits: 20,
-    totalSpent: 3200,
+    totalSpent: 3200000,
     preferredStylist: 'Lisa',
     rating: 5,
-    notes: 'VIP client, nail art enthusiast'
+    notes: 'Klien VIP, penggemar nail art'
   }
 ];
 
@@ -76,10 +76,10 @@ export default function Clients() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Klien</h1>
         <button className="btn-primary">
           <Plus className="h-4 w-4 mr-2" />
-          Add Client
+          Tambah Klien
         </button>
       </div>
 
@@ -89,7 +89,7 @@ export default function Clients() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search clients..."
+            placeholder="Cari klien..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="input pl-10"
@@ -145,8 +145,10 @@ export default function Clients() {
                           />
                         ))}
                       </div>
-                      <p className="text-sm text-gray-600">{client.totalVisits} visits</p>
-                      <p className="text-sm font-medium text-gray-900">${client.totalSpent}</p>
+                      <p className="text-sm text-gray-600">{client.totalVisits} kunjungan</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(client.totalSpent)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -180,7 +182,7 @@ export default function Clients() {
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Contact Information</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Informasi Kontak</h3>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-gray-600">
                       <Mail className="h-4 w-4 mr-2" />
@@ -194,29 +196,33 @@ export default function Clients() {
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Visit History</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Riwayat Kunjungan</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Total Visits:</span>
+                      <span className="text-gray-600">Total Kunjungan:</span>
                       <span className="font-medium">{selectedClient.totalVisits}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Total Spent:</span>
-                      <span className="font-medium">${selectedClient.totalSpent}</span>
+                      <span className="text-gray-600">Total Dibelanjakan:</span>
+                      <span className="font-medium">
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(selectedClient.totalSpent)}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Last Visit:</span>
-                      <span className="font-medium">{selectedClient.lastVisit}</span>
+                      <span className="text-gray-600">Kunjungan Terakhir:</span>
+                      <span className="font-medium">
+                        {new Date(selectedClient.lastVisit).toLocaleDateString('id-ID')}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Preferred Stylist:</span>
+                      <span className="text-gray-600">Penata Rambut Pilihan:</span>
                       <span className="font-medium">{selectedClient.preferredStylist}</span>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Notes</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Catatan</h3>
                   <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
                     {selectedClient.notes}
                   </p>
@@ -225,7 +231,7 @@ export default function Clients() {
                 <div className="flex space-x-2 pt-4">
                   <button className="btn-primary flex-1">
                     <Calendar className="h-4 w-4 mr-2" />
-                    Book Appointment
+                    Buat Janji Temu
                   </button>
                   <button className="btn-secondary">Edit</button>
                 </div>
@@ -234,7 +240,7 @@ export default function Clients() {
           ) : (
             <div className="card">
               <div className="text-center text-gray-500">
-                <p>Select a client to view details</p>
+                <p>Pilih klien untuk melihat detail</p>
               </div>
             </div>
           )}
