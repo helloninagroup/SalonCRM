@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Minus, ShoppingCart, CreditCard, DollarSign, Receipt, User, Percent } from 'lucide-react';
+import { Plus, Minus, ShoppingCart, CreditCard, DollarSign, Receipt, User, Percent, Sparkles, Heart, Scissors } from 'lucide-react';
 import InvoiceModal from '../components/InvoiceModal';
 
 const services = [
-  { id: 1, name: 'Potong Rambut', price: 450000, category: 'Rambut' },
-  { id: 2, name: 'Cuci & Blow Rambut', price: 350000, category: 'Rambut' },
-  { id: 3, name: 'Pewarnaan Rambut', price: 1200000, category: 'Rambut' },
-  { id: 4, name: 'Highlight', price: 1500000, category: 'Rambut' },
-  { id: 5, name: 'Cukur Jenggot', price: 250000, category: 'Perawatan' },
-  { id: 6, name: 'Manikur', price: 400000, category: 'Kuku' },
-  { id: 7, name: 'Pedikur', price: 500000, category: 'Kuku' },
-  { id: 8, name: 'Perawatan Wajah', price: 800000, category: 'Perawatan Kulit' },
+  { id: 1, name: 'Potong Rambut', price: 450000, category: 'Rambut', color: 'bg-gradient-to-br from-pink-100 to-rose-200', icon: '✂️' },
+  { id: 2, name: 'Cuci & Blow Rambut', price: 350000, category: 'Rambut', color: 'bg-gradient-to-br from-blue-100 to-cyan-200', icon: '💧' },
+  { id: 3, name: 'Pewarnaan Rambut', price: 1200000, category: 'Rambut', color: 'bg-gradient-to-br from-purple-100 to-violet-200', icon: '🎨' },
+  { id: 4, name: 'Highlight', price: 1500000, category: 'Rambut', color: 'bg-gradient-to-br from-yellow-100 to-amber-200', icon: '✨' },
+  { id: 5, name: 'Cukur Jenggot', price: 250000, category: 'Perawatan', color: 'bg-gradient-to-br from-green-100 to-emerald-200', icon: '🧔' },
+  { id: 6, name: 'Manikur', price: 400000, category: 'Kuku', color: 'bg-gradient-to-br from-orange-100 to-peach-200', icon: '💅' },
+  { id: 7, name: 'Pedikur', price: 500000, category: 'Kuku', color: 'bg-gradient-to-br from-teal-100 to-cyan-200', icon: '🦶' },
+  { id: 8, name: 'Perawatan Wajah', price: 800000, category: 'Perawatan Kulit', color: 'bg-gradient-to-br from-indigo-100 to-purple-200', icon: '🧴' },
 ];
 
 const products = [
-  { id: 1, name: 'Sampo Premium', price: 280000, stock: 15, category: 'Perawatan Rambut' },
-  { id: 2, name: 'Kondisioner', price: 250000, stock: 12, category: 'Perawatan Rambut' },
-  { id: 3, name: 'Serum Rambut', price: 350000, stock: 8, category: 'Perawatan Rambut' },
-  { id: 4, name: 'Cat Kuku', price: 150000, stock: 25, category: 'Kuku' },
-  { id: 5, name: 'Masker Wajah', price: 220000, stock: 10, category: 'Perawatan Kulit' },
+  { id: 1, name: 'Sampo Premium', price: 280000, stock: 15, category: 'Perawatan Rambut', color: 'bg-gradient-to-br from-pink-100 to-rose-200', icon: '🧴' },
+  { id: 2, name: 'Kondisioner', price: 250000, stock: 12, category: 'Perawatan Rambut', color: 'bg-gradient-to-br from-lavender-100 to-purple-200', icon: '💜' },
+  { id: 3, name: 'Serum Rambut', price: 350000, stock: 8, category: 'Perawatan Rambut', color: 'bg-gradient-to-br from-amber-100 to-yellow-200', icon: '✨' },
+  { id: 4, name: 'Cat Kuku', price: 150000, stock: 25, category: 'Kuku', color: 'bg-gradient-to-br from-red-100 to-pink-200', icon: '💅' },
+  { id: 5, name: 'Masker Wajah', price: 220000, stock: 10, category: 'Perawatan Kulit', color: 'bg-gradient-to-br from-green-100 to-mint-200', icon: '🥒' },
 ];
 
 interface CartItem {
@@ -227,7 +227,7 @@ export default function POS() {
     }
     
     const transactionSummary = `
-Transaksi berhasil!
+Transaksi berhasil! ✨
 
 Pelanggan: ${clientName}
 Karyawan: ${selectedEmp?.name} (${selectedEmp?.position})
@@ -262,245 +262,346 @@ Komisi akan ditambahkan ke akun karyawan.
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Titik Penjualan</h1>
-        <div className="flex items-center space-x-4">
-          <select
-            value={selectedClient}
-            onChange={(e) => setSelectedClient(e.target.value)}
-            className="input"
-          >
-            <option value="">Pilih Pelanggan</option>
-            {clients.map(client => (
-              <option key={client.id} value={client.id.toString()}>
-                {client.name} - {client.phone}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Services & Products */}
-        <div className="lg:col-span-2">
-          <div className="card">
-            <div className="flex border-b border-gray-200 mb-6">
-              <button
-                onClick={() => setActiveTab('services')}
-                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                  activeTab === 'services'
-                    ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                Layanan
-              </button>
-              <button
-                onClick={() => setActiveTab('products')}
-                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                  activeTab === 'products'
-                    ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                Produk
-              </button>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
+      <div className="space-y-6 p-6">
+        {/* Header dengan gradient yang cantik */}
+        <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl shadow-lg">
+              <Scissors className="h-6 w-6 text-white" />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {activeTab === 'services' ? (
-                services.map((service) => (
-                  <div
-                    key={service.id}
-                    onClick={() => addToCart(service, 'service')}
-                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{service.name}</h3>
-                        <p className="text-sm text-gray-600">{service.category}</p>
-                      </div>
-                      <span className="text-lg font-bold text-primary-600">
-                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(service.price)}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                products.map((product) => (
-                  <div
-                    key={product.id}
-                    onClick={() => addToCart(product, 'product')}
-                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{product.name}</h3>
-                        <p className="text-sm text-gray-600">{product.category}</p>
-                        <p className="text-xs text-gray-500">Stok: {product.stock}</p>
-                      </div>
-                      <span className="text-lg font-bold text-primary-600">
-                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(product.price)}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                Titik Penjualan
+              </h1>
+              <p className="text-sm text-gray-500">Sistem kasir salon yang cantik</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <select
+                value={selectedClient}
+                onChange={(e) => setSelectedClient(e.target.value)}
+                className="appearance-none bg-gradient-to-r from-blue-100 to-purple-100 border-0 rounded-xl px-4 py-3 pr-10 text-gray-700 focus:ring-2 focus:ring-purple-300 focus:outline-none shadow-md"
+              >
+                <option value="">✨ Pilih Pelanggan</option>
+                {clients.map(client => (
+                  <option key={client.id} value={client.id.toString()}>
+                    {client.name} - {client.phone}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <Heart className="h-4 w-4 text-purple-400" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Cart */}
-        <div className="lg:col-span-1">
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Keranjang</h2>
-              <ShoppingCart className="h-5 w-5 text-gray-400" />
-            </div>
-
-            {/* Employee Selection */}
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center space-x-2 mb-2">
-                <User className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900">Karyawan yang Melayani</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Services & Products dengan design yang lebih menarik */}
+          <div className="lg:col-span-2">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+              {/* Tab Navigation dengan gradient */}
+              <div className="flex bg-gradient-to-r from-pink-100 to-purple-100 p-1 m-4 rounded-xl">
+                <button
+                  onClick={() => setActiveTab('services')}
+                  className={`flex-1 px-6 py-3 font-medium text-sm rounded-lg transition-all duration-300 ${
+                    activeTab === 'services'
+                      ? 'bg-white text-purple-700 shadow-lg transform scale-105'
+                      : 'text-purple-600 hover:text-purple-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <Sparkles className="h-4 w-4" />
+                    <span>Layanan</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setActiveTab('products')}
+                  className={`flex-1 px-6 py-3 font-medium text-sm rounded-lg transition-all duration-300 ${
+                    activeTab === 'products'
+                      ? 'bg-white text-purple-700 shadow-lg transform scale-105'
+                      : 'text-purple-600 hover:text-purple-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <ShoppingCart className="h-4 w-4" />
+                    <span>Produk</span>
+                  </div>
+                </button>
               </div>
-              
-              {employees.length === 0 ? (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                  <p className="text-sm text-yellow-800">
-                    Belum ada karyawan aktif. Silakan tambahkan karyawan melalui menu "Karyawan".
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <select
-                    value={selectedEmployee}
-                    onChange={(e) => handleEmployeeChange(e.target.value)}
-                    className="input text-sm"
-                  >
-                    <option value="">Pilih Karyawan</option>
-                    {employees.map(employee => (
-                      <option key={employee.id} value={employee.id.toString()}>
-                        {employee.name} - {employee.position}
-                      </option>
-                    ))}
-                  </select>
-                  
-                  {/* Commission Rate */}
-                  {selectedEmployee && (
-                    <div className="mt-2 flex items-center justify-between">
-                      <div className="flex items-center space-x-1">
-                        <Percent className="h-3 w-3 text-blue-600" />
-                        <span className="text-xs text-blue-700">Komisi:</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="number"
-                          value={commissionRate}
-                          onChange={(e) => setCommissionRate(Math.max(0, Math.min(50, parseFloat(e.target.value) || 0)))}
-                          className="w-16 px-2 py-1 text-xs border border-blue-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                          min="0"
-                          max="50"
-                          step="0.5"
-                        />
-                        <span className="text-xs text-blue-700">%</span>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
 
-            {cart.length === 0 ? (
-              <div className="text-center text-gray-500 py-8">
-                <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Keranjang kosong</p>
-              </div>
-            ) : (
-              <>
-                <div className="space-y-3 mb-6">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{item.name}</h4>
-                        <p className="text-sm text-gray-600">
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.price)} per item
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="p-1 rounded-full hover:bg-gray-200"
-                        >
-                          <Minus className="h-4 w-4" />
-                        </button>
-                        <span className="w-8 text-center font-medium">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="p-1 rounded-full hover:bg-gray-200"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-t border-gray-200 pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal:</span>
-                    <span className="font-medium">
-                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(subtotal)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Pajak (5%):</span>
-                    <span className="font-medium">
-                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(tax)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-2">
-                    <span>Total:</span>
-                    <span>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total)}</span>
-                  </div>
-                  
-                  {/* Commission Display */}
-                  {selectedEmployee && commissionRate > 0 && (
-                    <div className="flex justify-between text-sm bg-green-50 p-2 rounded-md border border-green-200">
-                      <span className="text-green-700 font-medium">Komisi ({commissionRate}%):</span>
-                      <span className="font-bold text-green-800">
-                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(commissionAmount)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-6 space-y-3">
-                  <button
-                    onClick={handleCheckout}
-                    className="w-full btn-primary"
-                    disabled={!selectedEmployee || employees.length === 0}
-                  >
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Proses Pembayaran
-                  </button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button className="btn-secondary text-sm">
-                      <DollarSign className="h-4 w-4 mr-1" />
-                      Tunai
-                    </button>
-                    <button 
-                      onClick={handleShowInvoice}
-                      className="btn-secondary text-sm"
+              {/* Grid Items dengan warna pastel */}
+              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {activeTab === 'services' ? (
+                  services.map((service) => (
+                    <div
+                      key={service.id}
+                      onClick={() => addToCart(service, 'service')}
+                      className={`${service.color} p-6 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border border-white/30 group`}
                     >
-                      <Receipt className="h-4 w-4 mr-1" />
-                      Faktur
-                    </button>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <span className="text-2xl">{service.icon}</span>
+                            <div>
+                              <h3 className="font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">
+                                {service.name}
+                              </h3>
+                              <p className="text-sm text-gray-600 bg-white/50 px-2 py-1 rounded-full inline-block">
+                                {service.category}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-bold text-gray-800 bg-white/70 px-3 py-1 rounded-full">
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(service.price)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="bg-white/50 rounded-lg p-2 text-center">
+                          <span className="text-sm text-gray-700 font-medium">Klik untuk menambah ke keranjang</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  products.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => addToCart(product, 'product')}
+                      className={`${product.color} p-6 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border border-white/30 group`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <span className="text-2xl">{product.icon}</span>
+                            <div>
+                              <h3 className="font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">
+                                {product.name}
+                              </h3>
+                              <p className="text-sm text-gray-600 bg-white/50 px-2 py-1 rounded-full inline-block">
+                                {product.category}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1 bg-white/40 px-2 py-1 rounded-full inline-block">
+                                Stok: {product.stock}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-bold text-gray-800 bg-white/70 px-3 py-1 rounded-full">
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="bg-white/50 rounded-lg p-2 text-center">
+                          <span className="text-sm text-gray-700 font-medium">Klik untuk menambah ke keranjang</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Cart dengan design yang lebih cantik */}
+          <div className="lg:col-span-1">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+              {/* Cart Header */}
+              <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-white/20 rounded-lg">
+                      <ShoppingCart className="h-5 w-5" />
+                    </div>
+                    <h2 className="text-lg font-semibold">Keranjang Belanja</h2>
+                  </div>
+                  <div className="bg-white/20 px-3 py-1 rounded-full">
+                    <span className="text-sm font-medium">{cart.length} item</span>
                   </div>
                 </div>
-              </>
-            )}
+              </div>
+
+              <div className="p-6">
+                {/* Employee Selection dengan design cantik */}
+                <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200/50 rounded-xl">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <div className="p-2 bg-blue-400 rounded-lg">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-blue-900">Karyawan yang Melayani</span>
+                  </div>
+                  
+                  {employees.length === 0 ? (
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                      <p className="text-sm text-yellow-800">
+                        Belum ada karyawan aktif. Silakan tambahkan karyawan melalui menu "Karyawan".
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <select
+                        value={selectedEmployee}
+                        onChange={(e) => handleEmployeeChange(e.target.value)}
+                        className="w-full bg-white border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-300 focus:outline-none shadow-md"
+                      >
+                        <option value="">Pilih Karyawan</option>
+                        {employees.map(employee => (
+                          <option key={employee.id} value={employee.id.toString()}>
+                            {employee.name} - {employee.position}
+                          </option>
+                        ))}
+                      </select>
+                      
+                      {/* Commission Rate dengan design cantik */}
+                      {selectedEmployee && (
+                        <div className="mt-3 flex items-center justify-between bg-white/70 p-3 rounded-xl">
+                          <div className="flex items-center space-x-2">
+                            <Percent className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm text-blue-700 font-medium">Komisi:</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="number"
+                              value={commissionRate}
+                              onChange={(e) => setCommissionRate(Math.max(0, Math.min(50, parseFloat(e.target.value) || 0)))}
+                              className="w-16 px-2 py-1 text-sm border-0 bg-white rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none shadow-sm"
+                              min="0"
+                              max="50"
+                              step="0.5"
+                            />
+                            <span className="text-sm text-blue-700 font-medium">%</span>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {cart.length === 0 ? (
+                  <div className="text-center text-gray-500 py-12">
+                    <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+                      <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                      <p className="text-lg font-medium">Keranjang kosong</p>
+                      <p className="text-sm text-gray-400 mt-1">Pilih layanan atau produk untuk memulai</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Cart Items dengan design cantik */}
+                    <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
+                      {cart.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200/50">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900">{item.name}</h4>
+                            <p className="text-sm text-gray-600">
+                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price)} per item
+                            </p>
+                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
+                              item.type === 'service' 
+                                ? 'bg-purple-100 text-purple-700' 
+                                : 'bg-green-100 text-green-700'
+                            }`}>
+                              {item.type === 'service' ? '🎨 Layanan' : '🛍️ Produk'}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="p-2 bg-red-100 hover:bg-red-200 rounded-full transition-colors"
+                            >
+                              <Minus className="h-4 w-4 text-red-600" />
+                            </button>
+                            <span className="w-8 text-center font-bold text-lg">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
+                            >
+                              <Plus className="h-4 w-4 text-green-600" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Total Section dengan gradient cantik */}
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-xl p-4 space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Subtotal:</span>
+                        <span className="font-medium">
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(subtotal)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Pajak (5%):</span>
+                        <span className="font-medium">
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(tax)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-lg font-bold border-t border-purple-200 pt-3">
+                        <span>Total:</span>
+                        <span className="text-purple-700">
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total)}
+                        </span>
+                      </div>
+                      
+                      {/* Commission Display dengan design cantik */}
+                      {selectedEmployee && commissionRate > 0 && (
+                        <div className="flex justify-between text-sm bg-gradient-to-r from-green-100 to-emerald-100 p-3 rounded-xl border border-green-200">
+                          <span className="text-green-700 font-medium flex items-center">
+                            <Sparkles className="h-4 w-4 mr-1" />
+                            Komisi ({commissionRate}%):
+                          </span>
+                          <span className="font-bold text-green-800">
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(commissionAmount)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons dengan gradient cantik */}
+                    <div className="mt-6 space-y-3">
+                      <button
+                        onClick={handleCheckout}
+                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        disabled={!selectedEmployee || employees.length === 0}
+                      >
+                        <div className="flex items-center justify-center space-x-2">
+                          <CreditCard className="h-5 w-5" />
+                          <span>Proses Pembayaran</span>
+                          <Sparkles className="h-4 w-4" />
+                        </div>
+                      </button>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <button className="bg-gradient-to-r from-green-400 to-emerald-400 hover:from-green-500 hover:to-emerald-500 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-md">
+                          <div className="flex items-center justify-center space-x-1">
+                            <DollarSign className="h-4 w-4" />
+                            <span className="text-sm">Tunai</span>
+                          </div>
+                        </button>
+                        <button 
+                          onClick={handleShowInvoice}
+                          className="bg-gradient-to-r from-blue-400 to-cyan-400 hover:from-blue-500 hover:to-cyan-500 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-md"
+                        >
+                          <div className="flex items-center justify-center space-x-1">
+                            <Receipt className="h-4 w-4" />
+                            <span className="text-sm">Faktur</span>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

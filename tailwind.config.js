@@ -24,7 +24,23 @@ export default {
           500: '#a855f7',
           600: '#9333ea',
           700: '#7c3aed',
+        },
+        // Tambahan warna pastel
+        lavender: {
+          100: '#f3f0ff',
+          200: '#e9e5ff',
+        },
+        peach: {
+          100: '#fef3f2',
+          200: '#fde8e6',
+        },
+        mint: {
+          100: '#f0fdf4',
+          200: '#dcfce7',
         }
+      },
+      backdropBlur: {
+        xs: '2px',
       }
     },
   },
