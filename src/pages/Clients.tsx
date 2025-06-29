@@ -1,7 +1,25 @@
-import React, { useState } from 'react';
-import { Plus, Search, Filter, Phone, Mail, Calendar, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Filter, Phone, Mail, Calendar, Star, Edit3, Trash2 } from 'lucide-react';
+import AddClientModal from '../components/AddClientModal';
 
-const clients = [
+interface Client {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  lastVisit: string;
+  totalVisits: number;
+  totalSpent: number;
+  preferredStylist: string;
+  rating: number;
+  notes: string;
+  address?: string;
+  dateOfBirth?: string;
+  allergies?: string;
+  emergencyContact?: string;
+}
+
+const initialClients: Client[] = [
   {
     id: 1,
     name: 'Emma Wilson',
@@ -12,7 +30,11 @@ const clients = [
     totalSpent: 1240000,
     preferredStylist: 'Sarah',
     rating: 5,
-    notes: 'Lebih suka warna rambut natural, alergi sulfat'
+    notes: 'Lebih suka warna rambut natural, alergi sulfat',
+    address: 'Jl. Sudirman No. 123, Jakarta',
+    dateOfBirth: '1990-05-15',
+    allergies: 'Sulfat',
+    emergencyContact: '+62 813-1111-0001'
   },
   {
     id: 2,
@@ -24,7 +46,10 @@ const clients = [
     totalSpent: 680000,
     preferredStylist: 'Jake',
     rating: 4,
-    notes: 'Perawatan jenggot rutin, suka potongan pendek'
+    notes: 'Perawatan jenggot rutin, suka potongan pendek',
+    address: 'Jl. Thamrin No. 456, Jakarta',
+    dateOfBirth: '1985-08-22',
+    emergencyContact: '+62 813-1111-0002'
   },
   {
     id: 3,
@@ -36,7 +61,10 @@ const clients = [
     totalSpent: 2100000,
     preferredStylist: 'Maria',
     rating: 5,
-    notes: 'Suka warna berani, sering highlight'
+    notes: 'Suka warna berani, sering highlight',
+    address: 'Jl. Kemang No. 789, Jakarta',
+    dateOfBirth: '1992-03-10',
+    emergencyContact: '+62 813-1111-0003'
   },
   {
     id: 4,
@@ -48,7 +76,10 @@ const clients = [
     totalSpent: 420000,
     preferredStylist: 'Sarah',
     rating: 4,
-    notes: 'Profesional bisnis, gaya klasik'
+    notes: 'Profesional bisnis, gaya klasik',
+    address: 'Jl. Senopati No. 321, Jakarta',
+    dateOfBirth: '1988-11-05',
+    emergencyContact: '+62 813-1111-0004'
   },
   {
     id: 5,
@@ -60,24 +91,126 @@ const clients = [
     totalSpent: 3200000,
     preferredStylist: 'Lisa',
     rating: 5,
-    notes: 'Klien VIP, penggemar nail art'
+    notes: 'Klien VIP, penggemar nail art',
+    address: 'Jl. Kuningan No. 654, Jakarta',
+    dateOfBirth: '1987-07-18',
+    allergies: 'Latex',
+    emergencyContact: '+62 813-1111-0005'
   }
 ];
 
+// Fungsi untuk mengambil data dari localStorage
+const getClientsFromStorage = (): Client[] => {
+  try {
+    const stored = localStorage.getItem('salon_clients');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Error loading clients from storage:', error);
+  }
+  return initialClients;
+};
+
+const saveClientsToStorage = (clients: Client[]) => {
+  try {
+    localStorage.setItem('salon_clients', JSON.stringify(clients));
+  } catch (error) {
+    console.error('Error saving clients to storage:', error);
+  }
+};
+
+// Fungsi untuk mengambil daftar stylist dari data karyawan
+const getStylistsFromStorage = (): string[] => {
+  try {
+    const stored = localStorage.getItem('salon_employees');
+    if (stored) {
+      const employees = JSON.parse(stored);
+      return employees
+        .filter((emp: any) => emp.status === 'aktif')
+        .map((emp: any) => emp.name);
+    }
+  } catch (error) {
+    console.error('Error loading stylists from storage:', error);
+  }
+  return ['Sarah', 'Maria', 'Jake', 'Lisa', 'Ahmad']; // Default stylists
+};
+
 export default function Clients() {
+  const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedClient, setSelectedClient] = useState<typeof clients[0] | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [stylists, setStylists] = useState<string[]>([]);
+
+  // Load data saat komponen dimount
+  useEffect(() => {
+    const loadedClients = getClientsFromStorage();
+    const loadedStylists = getStylistsFromStorage();
+    setClients(loadedClients);
+    setStylists(loadedStylists);
+  }, []);
+
+  // Listen untuk perubahan data karyawan
+  useEffect(() => {
+    const handleEmployeesUpdate = () => {
+      const loadedStylists = getStylistsFromStorage();
+      setStylists(loadedStylists);
+    };
+
+    window.addEventListener('employeesUpdated', handleEmployeesUpdate);
+    return () => {
+      window.removeEventListener('employeesUpdated', handleEmployeesUpdate);
+    };
+  }, []);
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleAddClient = (clientData: Omit<Client, 'id' | 'lastVisit' | 'totalVisits' | 'totalSpent' | 'rating'>) => {
+    const newClient: Client = {
+      ...clientData,
+      id: Math.max(...clients.map(c => c.id), 0) + 1,
+      lastVisit: new Date().toISOString().split('T')[0],
+      totalVisits: 0,
+      totalSpent: 0,
+      rating: 0
+    };
+    
+    const updatedClients = [...clients, newClient];
+    setClients(updatedClients);
+    saveClientsToStorage(updatedClients);
+    
+    alert(`Klien "${newClient.name}" berhasil ditambahkan!`);
+  };
+
+  const handleDeleteClient = (id: number) => {
+    const client = clients.find(c => c.id === id);
+    if (!client) return;
+
+    if (confirm(`Apakah Anda yakin ingin menghapus klien "${client.name}"?`)) {
+      const updatedClients = clients.filter(c => c.id !== id);
+      setClients(updatedClients);
+      saveClientsToStorage(updatedClients);
+      
+      if (selectedClient?.id === id) {
+        setSelectedClient(null);
+      }
+      
+      alert(`Klien "${client.name}" berhasil dihapus!`);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Klien</h1>
-        <button className="btn-primary">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="btn-primary"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Tambah Klien
         </button>
@@ -106,53 +239,72 @@ export default function Clients() {
         <div className="lg:col-span-2">
           <div className="card">
             <div className="space-y-4">
-              {filteredClients.map((client) => (
-                <div
-                  key={client.id}
-                  onClick={() => setSelectedClient(client)}
-                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="h-12 w-12 bg-primary-100 rounded-full flex items-center justify-center">
-                        <span className="text-lg font-semibold text-primary-700">
-                          {client.name.split(' ').map(n => n[0]).join('')}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{client.name}</h3>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600">
-                          <span className="flex items-center">
-                            <Mail className="h-3 w-3 mr-1" />
-                            {client.email}
-                          </span>
-                          <span className="flex items-center">
-                            <Phone className="h-3 w-3 mr-1" />
-                            {client.phone}
+              {filteredClients.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <p>Tidak ada klien yang ditemukan</p>
+                </div>
+              ) : (
+                filteredClients.map((client) => (
+                  <div
+                    key={client.id}
+                    onClick={() => setSelectedClient(client)}
+                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-12 w-12 bg-primary-100 rounded-full flex items-center justify-center">
+                          <span className="text-lg font-semibold text-primary-700">
+                            {client.name.split(' ').map(n => n[0]).join('')}
                           </span>
                         </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{client.name}</h3>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span className="flex items-center">
+                              <Mail className="h-3 w-3 mr-1" />
+                              {client.email}
+                            </span>
+                            <span className="flex items-center">
+                              <Phone className="h-3 w-3 mr-1" />
+                              {client.phone}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="text-right">
-                      <div className="flex items-center space-x-1 mb-1">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < client.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                            }`}
-                          />
-                        ))}
+                      
+                      <div className="flex items-center space-x-2">
+                        <div className="text-right">
+                          <div className="flex items-center space-x-1 mb-1">
+                            {Array.from({ length: 5 }, (_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < client.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-sm text-gray-600">{client.totalVisits} kunjungan</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(client.totalSpent)}
+                          </p>
+                        </div>
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClient(client.id);
+                          }}
+                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                          title="Hapus Klien"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
-                      <p className="text-sm text-gray-600">{client.totalVisits} kunjungan</p>
-                      <p className="text-sm font-medium text-gray-900">
-                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(client.totalSpent)}
-                      </p>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -192,8 +344,33 @@ export default function Clients() {
                       <Phone className="h-4 w-4 mr-2" />
                       {selectedClient.phone}
                     </div>
+                    {selectedClient.address && (
+                      <div className="flex items-start text-sm text-gray-600">
+                        <Mail className="h-4 w-4 mr-2 mt-0.5" />
+                        {selectedClient.address}
+                      </div>
+                    )}
+                    {selectedClient.emergencyContact && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Phone className="h-4 w-4 mr-2" />
+                        Darurat: {selectedClient.emergencyContact}
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {selectedClient.dateOfBirth && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</h3>
+                    <p className="text-sm text-gray-600">
+                      {new Date(selectedClient.dateOfBirth).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Riwayat Kunjungan</h3>
@@ -221,6 +398,15 @@ export default function Clients() {
                   </div>
                 </div>
 
+                {selectedClient.allergies && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Alergi & Sensitivitas</h3>
+                    <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                      {selectedClient.allergies}
+                    </p>
+                  </div>
+                )}
+
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Catatan</h3>
                   <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
@@ -246,6 +432,14 @@ export default function Clients() {
           )}
         </div>
       </div>
+
+      {/* Add Client Modal */}
+      <AddClientModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAdd={handleAddClient}
+        stylists={stylists}
+      />
     </div>
   );
 }
