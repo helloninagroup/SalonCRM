@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, Search, Filter, Package, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
+import AddProductModal from '../components/AddProductModal';
 
-const inventory = [
+const initialInventory = [
   {
     id: 1,
     name: 'Sampo Premium',
@@ -12,7 +13,8 @@ const inventory = [
     cost: 180000,
     supplier: 'Beauty Supply Co.',
     lastRestocked: '2024-01-10',
-    status: 'tersedia'
+    status: 'tersedia',
+    description: 'Sampo premium untuk semua jenis rambut'
   },
   {
     id: 2,
@@ -24,7 +26,8 @@ const inventory = [
     cost: 150000,
     supplier: 'Natural Beauty Ltd.',
     lastRestocked: '2024-01-05',
-    status: 'stok rendah'
+    status: 'stok rendah',
+    description: 'Kondisioner organik tanpa sulfat'
   },
   {
     id: 3,
@@ -36,7 +39,8 @@ const inventory = [
     cost: 120000,
     supplier: 'Style Pro Inc.',
     lastRestocked: '2024-01-12',
-    status: 'tersedia'
+    status: 'tersedia',
+    description: 'Gel penata rambut tahan lama'
   },
   {
     id: 4,
@@ -48,7 +52,8 @@ const inventory = [
     cost: 250000,
     supplier: 'Nail Art Supplies',
     lastRestocked: '2023-12-28',
-    status: 'stok rendah'
+    status: 'stok rendah',
+    description: 'Set lengkap cat kuku berbagai warna'
   },
   {
     id: 5,
@@ -60,7 +65,8 @@ const inventory = [
     cost: 200000,
     supplier: 'Skincare Solutions',
     lastRestocked: '2023-12-15',
-    status: 'stok habis'
+    status: 'stok habis',
+    description: 'Pelembab wajah untuk kulit sensitif'
   },
   {
     id: 6,
@@ -72,16 +78,19 @@ const inventory = [
     cost: 220000,
     supplier: 'Beauty Supply Co.',
     lastRestocked: '2024-01-08',
-    status: 'tersedia'
+    status: 'tersedia',
+    description: 'Serum rambut untuk rambut rusak'
   }
 ];
 
-const categories = ['Semua', 'Perawatan Rambut', 'Penataan', 'Kuku', 'Perawatan Kulit'];
+const categories = ['Semua', 'Perawatan Rambut', 'Penataan', 'Kuku', 'Perawatan Kulit', 'Alat Salon', 'Lainnya'];
 
 export default function Inventory() {
+  const [inventory, setInventory] = useState(initialInventory);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [sortBy, setSortBy] = useState('name');
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -98,6 +107,41 @@ export default function Inventory() {
       case 'stok rendah': return <AlertTriangle className="h-4 w-4" />;
       case 'stok habis': return <TrendingDown className="h-4 w-4" />;
       default: return <Package className="h-4 w-4" />;
+    }
+  };
+
+  const handleAddProduct = (newProduct: any) => {
+    setInventory(prev => [...prev, newProduct]);
+    
+    // Show success message
+    alert(`Produk "${newProduct.name}" berhasil ditambahkan ke inventaris!`);
+  };
+
+  const handleDeleteProduct = (id: number) => {
+    if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
+      setInventory(prev => prev.filter(item => item.id !== id));
+      alert('Produk berhasil dihapus!');
+    }
+  };
+
+  const handleRestockProduct = (id: number) => {
+    const restockAmount = prompt('Masukkan jumlah stok yang ingin ditambahkan:');
+    if (restockAmount && !isNaN(Number(restockAmount)) && Number(restockAmount) > 0) {
+      setInventory(prev => prev.map(item => {
+        if (item.id === id) {
+          const newStock = item.stock + Number(restockAmount);
+          return {
+            ...item,
+            stock: newStock,
+            lastRestocked: new Date().toISOString().split('T')[0],
+            status: newStock <= item.minStock 
+              ? (newStock === 0 ? 'stok habis' : 'stok rendah')
+              : 'tersedia'
+          };
+        }
+        return item;
+      }));
+      alert(`Stok berhasil ditambahkan sebanyak ${restockAmount} unit!`);
     }
   };
 
@@ -124,7 +168,10 @@ export default function Inventory() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Manajemen Inventaris</h1>
-        <button className="btn-primary">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="btn-primary"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Tambah Produk
         </button>
@@ -248,6 +295,9 @@ export default function Inventory() {
                       <div className="text-sm text-gray-500">
                         Terakhir distok ulang: {new Date(item.lastRestocked).toLocaleDateString('id-ID')}
                       </div>
+                      {item.description && (
+                        <div className="text-xs text-gray-400 mt-1">{item.description}</div>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -276,11 +326,17 @@ export default function Inventory() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button className="text-primary-600 hover:text-primary-900">
-                        Edit
-                      </button>
-                      <button className="text-green-600 hover:text-green-900">
+                      <button 
+                        onClick={() => handleRestockProduct(item.id)}
+                        className="text-green-600 hover:text-green-900"
+                      >
                         Restok
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteProduct(item.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Hapus
                       </button>
                     </div>
                   </td>
@@ -290,6 +346,13 @@ export default function Inventory() {
           </table>
         </div>
       </div>
+
+      {/* Add Product Modal */}
+      <AddProductModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAdd={handleAddProduct}
+      />
     </div>
   );
 }
