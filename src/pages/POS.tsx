@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Minus, ShoppingCart, CreditCard, DollarSign, Receipt } from 'lucide-react';
+import InvoiceModal from '../components/InvoiceModal';
 
 const services = [
   { id: 1, name: 'Hair Cut', price: 45, category: 'Hair' },
@@ -20,6 +21,14 @@ const products = [
   { id: 5, name: 'Face Mask', price: 22, stock: 10, category: 'Skincare' },
 ];
 
+const clients = [
+  { value: 'emma', label: 'Emma Wilson' },
+  { value: 'michael', label: 'Michael Brown' },
+  { value: 'lisa', label: 'Lisa Davis' },
+  { value: 'john', label: 'John Smith' },
+  { value: 'anna', label: 'Anna Johnson' },
+];
+
 interface CartItem {
   id: string;
   name: string;
@@ -32,6 +41,7 @@ export default function POS() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeTab, setActiveTab] = useState<'services' | 'products'>('services');
   const [selectedClient, setSelectedClient] = useState('');
+  const [showInvoice, setShowInvoice] = useState(false);
 
   const addToCart = (item: typeof services[0] | typeof products[0], type: 'service' | 'product') => {
     const cartItemId = `${type}-${item.id}`;
@@ -74,6 +84,19 @@ export default function POS() {
     setCart([]);
   };
 
+  const handleShowInvoice = () => {
+    if (cart.length === 0) {
+      alert('Cart is empty. Add items to generate invoice.');
+      return;
+    }
+    setShowInvoice(true);
+  };
+
+  const getClientName = () => {
+    const client = clients.find(c => c.value === selectedClient);
+    return client ? client.label : 'Walk-in Customer';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -85,9 +108,9 @@ export default function POS() {
             className="input"
           >
             <option value="">Select Client</option>
-            <option value="emma">Emma Wilson</option>
-            <option value="michael">Michael Brown</option>
-            <option value="lisa">Lisa Davis</option>
+            {clients.map(client => (
+              <option key={client.value} value={client.value}>{client.label}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -227,7 +250,10 @@ export default function POS() {
                       <DollarSign className="h-4 w-4 mr-1" />
                       Cash
                     </button>
-                    <button className="btn-secondary text-sm">
+                    <button 
+                      onClick={handleShowInvoice}
+                      className="btn-secondary text-sm"
+                    >
                       <Receipt className="h-4 w-4 mr-1" />
                       Invoice
                     </button>
@@ -238,6 +264,17 @@ export default function POS() {
           </div>
         </div>
       </div>
+
+      {/* Invoice Modal */}
+      <InvoiceModal
+        isOpen={showInvoice}
+        onClose={() => setShowInvoice(false)}
+        cart={cart}
+        clientName={getClientName()}
+        subtotal={subtotal}
+        tax={tax}
+        total={total}
+      />
     </div>
   );
 }
