@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
-import { Plus, Search, Filter, Package, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Search, Filter, Package, AlertTriangle, TrendingUp, TrendingDown, Building2 } from 'lucide-react';
 import AddProductModal from '../components/AddProductModal';
+import ManageSuppliersModal from '../components/ManageSuppliersModal';
+
+interface Supplier {
+  id: number;
+  name: string;
+  contact: string;
+  phone: string;
+  email: string;
+  address: string;
+}
 
 const initialInventory = [
   {
@@ -83,14 +93,67 @@ const initialInventory = [
   }
 ];
 
+const initialSuppliers: Supplier[] = [
+  {
+    id: 1,
+    name: 'Beauty Supply Co.',
+    contact: 'Sari Indah',
+    phone: '+62 21-5555-0001',
+    email: 'sari@beautysupply.co.id',
+    address: 'Jl. Sudirman No. 123, Jakarta Pusat'
+  },
+  {
+    id: 2,
+    name: 'Natural Beauty Ltd.',
+    contact: 'Budi Santoso',
+    phone: '+62 21-5555-0002',
+    email: 'budi@naturalbeauty.com',
+    address: 'Jl. Thamrin No. 456, Jakarta Pusat'
+  },
+  {
+    id: 3,
+    name: 'Style Pro Inc.',
+    contact: 'Maya Putri',
+    phone: '+62 21-5555-0003',
+    email: 'maya@stylepro.id',
+    address: 'Jl. Gatot Subroto No. 789, Jakarta Selatan'
+  },
+  {
+    id: 4,
+    name: 'Nail Art Supplies',
+    contact: 'Rina Dewi',
+    phone: '+62 21-5555-0004',
+    email: 'rina@nailart.co.id',
+    address: 'Jl. Kemang Raya No. 321, Jakarta Selatan'
+  },
+  {
+    id: 5,
+    name: 'Skincare Solutions',
+    contact: 'Ahmad Fauzi',
+    phone: '+62 21-5555-0005',
+    email: 'ahmad@skincare.id',
+    address: 'Jl. Senopati No. 654, Jakarta Selatan'
+  },
+  {
+    id: 6,
+    name: 'Professional Tools',
+    contact: 'Lisa Maharani',
+    phone: '+62 21-5555-0006',
+    email: 'lisa@protools.co.id',
+    address: 'Jl. Kuningan No. 987, Jakarta Selatan'
+  }
+];
+
 const categories = ['Semua', 'Perawatan Rambut', 'Penataan', 'Kuku', 'Perawatan Kulit', 'Alat Salon', 'Lainnya'];
 
 export default function Inventory() {
   const [inventory, setInventory] = useState(initialInventory);
+  const [suppliers, setSuppliers] = useState(initialSuppliers);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [sortBy, setSortBy] = useState('name');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showSuppliersModal, setShowSuppliersModal] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -145,6 +208,52 @@ export default function Inventory() {
     }
   };
 
+  // Supplier management functions
+  const handleAddSupplier = (supplierData: Omit<Supplier, 'id'>) => {
+    const newSupplier = {
+      ...supplierData,
+      id: Math.max(...suppliers.map(s => s.id), 0) + 1
+    };
+    setSuppliers(prev => [...prev, newSupplier]);
+    alert(`Pemasok "${supplierData.name}" berhasil ditambahkan!`);
+  };
+
+  const handleDeleteSupplier = (id: number) => {
+    const supplier = suppliers.find(s => s.id === id);
+    if (!supplier) return;
+
+    // Check if supplier is being used by any products
+    const productsUsingSupplier = inventory.filter(item => item.supplier === supplier.name);
+    
+    if (productsUsingSupplier.length > 0) {
+      alert(`Tidak dapat menghapus pemasok "${supplier.name}" karena masih digunakan oleh ${productsUsingSupplier.length} produk. Hapus atau ubah pemasok produk tersebut terlebih dahulu.`);
+      return;
+    }
+
+    setSuppliers(prev => prev.filter(s => s.id !== id));
+    alert(`Pemasok "${supplier.name}" berhasil dihapus!`);
+  };
+
+  const handleUpdateSupplier = (id: number, supplierData: Omit<Supplier, 'id'>) => {
+    const oldSupplier = suppliers.find(s => s.id === id);
+    if (!oldSupplier) return;
+
+    setSuppliers(prev => prev.map(s => 
+      s.id === id ? { ...supplierData, id } : s
+    ));
+
+    // Update supplier name in inventory if it changed
+    if (oldSupplier.name !== supplierData.name) {
+      setInventory(prev => prev.map(item => 
+        item.supplier === oldSupplier.name 
+          ? { ...item, supplier: supplierData.name }
+          : item
+      ));
+    }
+
+    alert(`Pemasok "${supplierData.name}" berhasil diperbarui!`);
+  };
+
   const filteredInventory = inventory
     .filter(item => 
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -168,13 +277,22 @@ export default function Inventory() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Manajemen Inventaris</h1>
-        <button 
-          onClick={() => setShowAddModal(true)}
-          className="btn-primary"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Tambah Produk
-        </button>
+        <div className="flex items-center space-x-3">
+          <button 
+            onClick={() => setShowSuppliersModal(true)}
+            className="btn-secondary"
+          >
+            <Building2 className="h-4 w-4 mr-2" />
+            Kelola Pemasok
+          </button>
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="btn-primary"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Produk
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -352,6 +470,17 @@ export default function Inventory() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onAdd={handleAddProduct}
+        suppliers={suppliers.map(s => s.name)}
+      />
+
+      {/* Manage Suppliers Modal */}
+      <ManageSuppliersModal
+        isOpen={showSuppliersModal}
+        onClose={() => setShowSuppliersModal(false)}
+        suppliers={suppliers}
+        onAddSupplier={handleAddSupplier}
+        onDeleteSupplier={handleDeleteSupplier}
+        onUpdateSupplier={handleUpdateSupplier}
       />
     </div>
   );

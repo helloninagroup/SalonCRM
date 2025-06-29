@@ -5,6 +5,7 @@ interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (product: any) => void;
+  suppliers: string[];
 }
 
 const categories = [
@@ -16,16 +17,7 @@ const categories = [
   'Lainnya'
 ];
 
-const suppliers = [
-  'Beauty Supply Co.',
-  'Natural Beauty Ltd.',
-  'Style Pro Inc.',
-  'Nail Art Supplies',
-  'Skincare Solutions',
-  'Professional Tools'
-];
-
-export default function AddProductModal({ isOpen, onClose, onAdd }: AddProductModalProps) {
+export default function AddProductModal({ isOpen, onClose, onAdd, suppliers }: AddProductModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     category: 'Perawatan Rambut',
@@ -33,7 +25,7 @@ export default function AddProductModal({ isOpen, onClose, onAdd }: AddProductMo
     minStock: '',
     price: '',
     cost: '',
-    supplier: 'Beauty Supply Co.',
+    supplier: suppliers.length > 0 ? suppliers[0] : '',
     description: ''
   });
 
@@ -84,6 +76,10 @@ export default function AddProductModal({ isOpen, onClose, onAdd }: AddProductMo
       newErrors.price = 'Harga jual harus lebih tinggi dari harga beli';
     }
 
+    if (!formData.supplier) {
+      newErrors.supplier = 'Pemasok wajib dipilih';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -123,7 +119,7 @@ export default function AddProductModal({ isOpen, onClose, onAdd }: AddProductMo
       minStock: '',
       price: '',
       cost: '',
-      supplier: 'Beauty Supply Co.',
+      supplier: suppliers.length > 0 ? suppliers[0] : '',
       description: ''
     });
     setErrors({});
@@ -261,19 +257,28 @@ export default function AddProductModal({ isOpen, onClose, onAdd }: AddProductMo
           {/* Pemasok */}
           <div>
             <label htmlFor="supplier" className="block text-sm font-medium text-gray-700 mb-1">
-              Pemasok
+              Pemasok *
             </label>
-            <select
-              id="supplier"
-              name="supplier"
-              value={formData.supplier}
-              onChange={handleInputChange}
-              className="input"
-            >
-              {suppliers.map(supplier => (
-                <option key={supplier} value={supplier}>{supplier}</option>
-              ))}
-            </select>
+            {suppliers.length > 0 ? (
+              <select
+                id="supplier"
+                name="supplier"
+                value={formData.supplier}
+                onChange={handleInputChange}
+                className={`input ${errors.supplier ? 'border-red-500' : ''}`}
+              >
+                {suppliers.map(supplier => (
+                  <option key={supplier} value={supplier}>{supplier}</option>
+                ))}
+              </select>
+            ) : (
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <p className="text-sm text-yellow-800">
+                  Belum ada pemasok yang terdaftar. Silakan tambahkan pemasok terlebih dahulu melalui menu "Kelola Pemasok".
+                </p>
+              </div>
+            )}
+            {errors.supplier && <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>}
           </div>
 
           {/* Deskripsi */}
@@ -297,6 +302,7 @@ export default function AddProductModal({ isOpen, onClose, onAdd }: AddProductMo
             <button
               type="submit"
               className="flex-1 btn-primary"
+              disabled={suppliers.length === 0}
             >
               <Package className="h-4 w-4 mr-2" />
               Tambah Produk
