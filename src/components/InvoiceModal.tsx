@@ -79,8 +79,13 @@ export default function InvoiceModal({
           </html>
         `);
         printWindow.document.close();
-        printWindow.print();
-        printWindow.close();
+        
+        // Wait for content to load before printing
+        printWindow.onload = function() {
+          setTimeout(() => {
+            printWindow.print();
+          }, 500);
+        };
       }
     }
   };
