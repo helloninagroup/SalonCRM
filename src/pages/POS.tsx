@@ -334,38 +334,49 @@ Komisi akan ditambahkan ke akun karyawan.
                 </button>
               </div>
 
-              {/* Grid Items dengan warna pastel - Mobile Responsive */}
-              <div className="p-3 lg:p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
+              {/* Grid Items dengan design kompak - Mobile Responsive */}
+              <div className="p-3 lg:p-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-3">
                 {activeTab === 'services' ? (
                   services.map((service) => (
                     <div
                       key={service.id}
                       onClick={() => addToCart(service, 'service')}
-                      className={`${service.color} p-4 lg:p-6 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border border-white/30 group`}
+                      className={`${service.color} p-3 lg:p-4 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border border-white/30 group relative overflow-hidden`}
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 lg:space-x-3 mb-2">
-                            <span className="text-lg lg:text-2xl">{service.icon}</span>
-                            <div>
-                              <h3 className="font-semibold text-gray-800 group-hover:text-gray-900 transition-colors text-sm lg:text-base">
-                                {service.name}
-                              </h3>
-                              <p className="text-xs lg:text-sm text-gray-600 bg-white/50 px-2 py-1 rounded-full inline-block">
-                                {service.category}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-sm lg:text-lg font-bold text-gray-800 bg-white/70 px-2 lg:px-3 py-1 rounded-full">
-                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(service.price)}
+                      {/* Icon di pojok kanan atas */}
+                      <div className="absolute top-2 right-2 text-lg lg:text-xl opacity-70 group-hover:opacity-100 transition-opacity">
+                        {service.icon}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {/* Nama layanan */}
+                        <h3 className="font-semibold text-gray-800 group-hover:text-gray-900 transition-colors text-xs lg:text-sm leading-tight pr-6">
+                          {service.name}
+                        </h3>
+                        
+                        {/* Kategori */}
+                        <p className="text-xs text-gray-600 bg-white/50 px-2 py-1 rounded-full inline-block">
+                          {service.category}
+                        </p>
+                        
+                        {/* Harga */}
+                        <div className="pt-1">
+                          <span className="text-xs lg:text-sm font-bold text-gray-800 bg-white/70 px-2 py-1 rounded-lg block text-center">
+                            {new Intl.NumberFormat('id-ID', { 
+                              style: 'currency', 
+                              currency: 'IDR', 
+                              minimumFractionDigits: 0,
+                              notation: 'compact',
+                              compactDisplay: 'short'
+                            }).format(service.price)}
                           </span>
                         </div>
                       </div>
-                      <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="bg-white/50 rounded-lg p-2 text-center">
-                          <span className="text-xs lg:text-sm text-gray-700 font-medium">Klik untuk menambah ke keranjang</span>
+                      
+                      {/* Hover effect */}
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                        <div className="bg-white/80 rounded-lg px-2 py-1">
+                          <span className="text-xs font-medium text-gray-700">Tambah ke keranjang</span>
                         </div>
                       </div>
                     </div>
@@ -375,34 +386,47 @@ Komisi akan ditambahkan ke akun karyawan.
                     <div
                       key={product.id}
                       onClick={() => addToCart(product, 'product')}
-                      className={`${product.color} p-4 lg:p-6 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border border-white/30 group`}
+                      className={`${product.color} p-3 lg:p-4 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border border-white/30 group relative overflow-hidden`}
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 lg:space-x-3 mb-2">
-                            <span className="text-lg lg:text-2xl">{product.icon}</span>
-                            <div>
-                              <h3 className="font-semibold text-gray-800 group-hover:text-gray-900 transition-colors text-sm lg:text-base">
-                                {product.name}
-                              </h3>
-                              <p className="text-xs lg:text-sm text-gray-600 bg-white/50 px-2 py-1 rounded-full inline-block">
-                                {product.category}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1 bg-white/40 px-2 py-1 rounded-full inline-block">
-                                Stok: {product.stock}
-                              </p>
-                            </div>
-                          </div>
+                      {/* Icon di pojok kanan atas */}
+                      <div className="absolute top-2 right-2 text-lg lg:text-xl opacity-70 group-hover:opacity-100 transition-opacity">
+                        {product.icon}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {/* Nama produk */}
+                        <h3 className="font-semibold text-gray-800 group-hover:text-gray-900 transition-colors text-xs lg:text-sm leading-tight pr-6">
+                          {product.name}
+                        </h3>
+                        
+                        {/* Kategori dan stok */}
+                        <div className="space-y-1">
+                          <p className="text-xs text-gray-600 bg-white/50 px-2 py-1 rounded-full inline-block">
+                            {product.category}
+                          </p>
+                          <p className="text-xs text-gray-500 bg-white/40 px-2 py-1 rounded-full inline-block">
+                            Stok: {product.stock}
+                          </p>
                         </div>
-                        <div className="text-right">
-                          <span className="text-sm lg:text-lg font-bold text-gray-800 bg-white/70 px-2 lg:px-3 py-1 rounded-full">
-                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(product.price)}
+                        
+                        {/* Harga */}
+                        <div className="pt-1">
+                          <span className="text-xs lg:text-sm font-bold text-gray-800 bg-white/70 px-2 py-1 rounded-lg block text-center">
+                            {new Intl.NumberFormat('id-ID', { 
+                              style: 'currency', 
+                              currency: 'IDR', 
+                              minimumFractionDigits: 0,
+                              notation: 'compact',
+                              compactDisplay: 'short'
+                            }).format(product.price)}
                           </span>
                         </div>
                       </div>
-                      <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="bg-white/50 rounded-lg p-2 text-center">
-                          <span className="text-xs lg:text-sm text-gray-700 font-medium">Klik untuk menambah ke keranjang</span>
+                      
+                      {/* Hover effect */}
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                        <div className="bg-white/80 rounded-lg px-2 py-1">
+                          <span className="text-xs font-medium text-gray-700">Tambah ke keranjang</span>
                         </div>
                       </div>
                     </div>
