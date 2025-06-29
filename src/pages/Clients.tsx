@@ -115,6 +115,8 @@ const getClientsFromStorage = (): Client[] => {
 const saveClientsToStorage = (clients: Client[]) => {
   try {
     localStorage.setItem('salon_clients', JSON.stringify(clients));
+    // Trigger custom event untuk memberitahu komponen lain
+    window.dispatchEvent(new CustomEvent('clientsUpdated'));
   } catch (error) {
     console.error('Error saving clients to storage:', error);
   }

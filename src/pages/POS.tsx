@@ -21,14 +21,6 @@ const products = [
   { id: 5, name: 'Masker Wajah', price: 220000, stock: 10, category: 'Perawatan Kulit' },
 ];
 
-const clients = [
-  { value: 'emma', label: 'Emma Wilson' },
-  { value: 'michael', label: 'Michael Brown' },
-  { value: 'lisa', label: 'Lisa Davis' },
-  { value: 'john', label: 'John Smith' },
-  { value: 'anna', label: 'Anna Johnson' },
-];
-
 interface CartItem {
   id: string;
   name: string;
@@ -43,6 +35,14 @@ interface Employee {
   position: string;
   defaultCommission: number;
   status: 'aktif' | 'tidak_aktif';
+}
+
+interface Client {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  preferredStylist?: string;
 }
 
 // Fungsi untuk mengambil data karyawan dari localStorage
@@ -66,13 +66,25 @@ const getEmployeesFromStorage = (): Employee[] => {
   ];
 };
 
-// Fungsi untuk menyimpan data karyawan ke localStorage
-const saveEmployeesToStorage = (employees: Employee[]) => {
+// Fungsi untuk mengambil data klien dari localStorage
+const getClientsFromStorage = (): Client[] => {
   try {
-    localStorage.setItem('salon_employees', JSON.stringify(employees));
+    const stored = localStorage.getItem('salon_clients');
+    if (stored) {
+      return JSON.parse(stored);
+    }
   } catch (error) {
-    console.error('Error saving employees to storage:', error);
+    console.error('Error loading clients from storage:', error);
   }
+  
+  // Data default jika tidak ada di localStorage
+  return [
+    { id: 1, name: 'Emma Wilson', email: 'emma.wilson@email.com', phone: '+62 812-3456-7890' },
+    { id: 2, name: 'Michael Brown', email: 'michael.brown@email.com', phone: '+62 813-4567-8901' },
+    { id: 3, name: 'Lisa Davis', email: 'lisa.davis@email.com', phone: '+62 814-5678-9012' },
+    { id: 4, name: 'John Smith', email: 'john.smith@email.com', phone: '+62 815-6789-0123' },
+    { id: 5, name: 'Anna Johnson', email: 'anna.johnson@email.com', phone: '+62 816-7890-1234' },
+  ];
 };
 
 export default function POS() {
@@ -80,15 +92,19 @@ export default function POS() {
   const [activeTab, setActiveTab] = useState<'services' | 'products'>('services');
   const [selectedClient, setSelectedClient] = useState('');
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [commissionRate, setCommissionRate] = useState(0);
   const [showInvoice, setShowInvoice] = useState(false);
 
-  // Load employees data saat komponen dimount
+  // Load data saat komponen dimount
   useEffect(() => {
     const loadedEmployees = getEmployeesFromStorage();
+    const loadedClients = getClientsFromStorage();
     const activeEmployees = loadedEmployees.filter(emp => emp.status === 'aktif');
+    
     setEmployees(activeEmployees);
+    setClients(loadedClients);
     
     // Set karyawan pertama sebagai default jika ada
     if (activeEmployees.length > 0) {
@@ -97,12 +113,15 @@ export default function POS() {
     }
   }, []);
 
-  // Listen untuk perubahan data karyawan dari halaman lain
+  // Listen untuk perubahan data dari halaman lain
   useEffect(() => {
-    const handleStorageChange = () => {
+    const handleDataChange = () => {
       const loadedEmployees = getEmployeesFromStorage();
+      const loadedClients = getClientsFromStorage();
       const activeEmployees = loadedEmployees.filter(emp => emp.status === 'aktif');
+      
       setEmployees(activeEmployees);
+      setClients(loadedClients);
       
       // Jika karyawan yang dipilih tidak ada lagi, pilih yang pertama
       const currentEmployee = activeEmployees.find(emp => emp.id.toString() === selectedEmployee);
@@ -113,14 +132,16 @@ export default function POS() {
     };
 
     // Listen untuk perubahan localStorage
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('storage', handleDataChange);
     
-    // Listen untuk custom event saat data karyawan berubah
-    window.addEventListener('employeesUpdated', handleStorageChange);
+    // Listen untuk custom event saat data berubah
+    window.addEventListener('employeesUpdated', handleDataChange);
+    window.addEventListener('clientsUpdated', handleDataChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('employeesUpdated', handleStorageChange);
+      window.removeEventListener('storage', handleDataChange);
+      window.removeEventListener('employeesUpdated', handleDataChange);
+      window.removeEventListener('clientsUpdated', handleDataChange);
     };
   }, [selectedEmployee]);
 
@@ -229,8 +250,10 @@ Komisi akan ditambahkan ke akun karyawan.
   };
 
   const getClientName = () => {
-    const client = clients.find(c => c.value === selectedClient);
-    return client ? client.label : 'Pelanggan Walk-in';
+    if (!selectedClient) return 'Pelanggan Walk-in';
+    
+    const client = clients.find(c => c.id.toString() === selectedClient);
+    return client ? client.name : 'Pelanggan Walk-in';
   };
 
   const getEmployeeName = () => {
@@ -250,7 +273,9 @@ Komisi akan ditambahkan ke akun karyawan.
           >
             <option value="">Pilih Pelanggan</option>
             {clients.map(client => (
-              <option key={client.value} value={client.value}>{client.label}</option>
+              <option key={client.id} value={client.id.toString()}>
+                {client.name} - {client.phone}
+              </option>
             ))}
           </select>
         </div>
