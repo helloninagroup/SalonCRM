@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import Appointments from './pages/Appointments';
 import Clients from './pages/Clients';
+import Employees from './pages/Employees';
 import POS from './pages/POS';
 import Inventory from './pages/Inventory';
 import Analytics from './pages/Analytics';
@@ -25,6 +26,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/appointments" element={<Appointments />} />
               <Route path="/clients" element={<Clients />} />
+              <Route path="/employees" element={<Employees />} />
               <Route path="/pos" element={<POS />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/analytics" element={<Analytics />} />

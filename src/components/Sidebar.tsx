@@ -8,7 +8,8 @@ import {
   Package, 
   BarChart3,
   X,
-  Scissors
+  Scissors,
+  UserCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -20,6 +21,7 @@ const navigation = [
   { name: 'Dasbor', href: '/', icon: LayoutDashboard },
   { name: 'Janji Temu', href: '/appointments', icon: Calendar },
   { name: 'Klien', href: '/clients', icon: Users },
+  { name: 'Karyawan', href: '/employees', icon: UserCheck },
   { name: 'Titik Penjualan', href: '/pos', icon: ShoppingCart },
   { name: 'Inventaris', href: '/inventory', icon: Package },
   { name: 'Analitik', href: '/analytics', icon: BarChart3 },
