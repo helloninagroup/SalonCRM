@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Users, DollarSign, Calendar, Star, TrendingUp, Edit3, Trash2, Eye } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -119,46 +119,44 @@ const initialEmployees: Employee[] = [
   }
 ];
 
-// Sample transaction data for commission reports
-const sampleTransactions: Transaction[] = [
-  {
-    id: 1,
-    employeeId: 1,
-    clientName: 'Emma Wilson',
-    services: ['Potong Rambut', 'Pewarnaan'],
-    total: 1650000,
-    commission: 198000,
-    commissionRate: 12,
-    date: '2024-01-15',
-    rating: 5
-  },
-  {
-    id: 2,
-    employeeId: 2,
-    clientName: 'Lisa Davis',
-    services: ['Highlight', 'Penataan'],
-    total: 1800000,
-    commission: 180000,
-    commissionRate: 10,
-    date: '2024-01-14',
-    rating: 5
-  },
-  {
-    id: 3,
-    employeeId: 3,
-    clientName: 'Michael Brown',
-    services: ['Cukur Jenggot'],
-    total: 250000,
-    commission: 20000,
-    commissionRate: 8,
-    date: '2024-01-13',
-    rating: 4
+// Fungsi untuk mengambil data dari localStorage
+const getEmployeesFromStorage = (): Employee[] => {
+  try {
+    const stored = localStorage.getItem('salon_employees');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Error loading employees from storage:', error);
   }
-];
+  return initialEmployees;
+};
+
+const saveEmployeesToStorage = (employees: Employee[]) => {
+  try {
+    localStorage.setItem('salon_employees', JSON.stringify(employees));
+    // Trigger custom event untuk memberitahu komponen lain
+    window.dispatchEvent(new CustomEvent('employeesUpdated'));
+  } catch (error) {
+    console.error('Error saving employees to storage:', error);
+  }
+};
+
+const getTransactionsFromStorage = (): Transaction[] => {
+  try {
+    const stored = localStorage.getItem('salon_transactions');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Error loading transactions from storage:', error);
+  }
+  return [];
+};
 
 export default function Employees() {
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
-  const [transactions] = useState<Transaction[]>(sampleTransactions);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'semua' | 'aktif' | 'tidak_aktif'>('semua');
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
@@ -166,6 +164,14 @@ export default function Employees() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showCommissionModal, setShowCommissionModal] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  // Load data saat komponen dimount
+  useEffect(() => {
+    const loadedEmployees = getEmployeesFromStorage();
+    const loadedTransactions = getTransactionsFromStorage();
+    setEmployees(loadedEmployees);
+    setTransactions(loadedTransactions);
+  }, []);
 
   const filteredEmployees = employees.filter(employee => {
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -182,13 +188,18 @@ export default function Employees() {
       totalTransactions: 0,
       averageRating: 0
     };
-    setEmployees(prev => [...prev, newEmployee]);
+    
+    const updatedEmployees = [...employees, newEmployee];
+    setEmployees(updatedEmployees);
+    saveEmployeesToStorage(updatedEmployees);
   };
 
   const handleUpdateEmployee = (id: number, employeeData: Partial<Employee>) => {
-    setEmployees(prev => prev.map(emp => 
+    const updatedEmployees = employees.map(emp => 
       emp.id === id ? { ...emp, ...employeeData } : emp
-    ));
+    );
+    setEmployees(updatedEmployees);
+    saveEmployeesToStorage(updatedEmployees);
   };
 
   const handleDeleteEmployee = (id: number) => {
@@ -196,7 +207,9 @@ export default function Employees() {
     if (!employee) return;
 
     if (confirm(`Apakah Anda yakin ingin menghapus karyawan "${employee.name}"?`)) {
-      setEmployees(prev => prev.filter(e => e.id !== id));
+      const updatedEmployees = employees.filter(e => e.id !== id);
+      setEmployees(updatedEmployees);
+      saveEmployeesToStorage(updatedEmployees);
       alert(`Karyawan "${employee.name}" berhasil dihapus!`);
     }
   };
@@ -228,7 +241,9 @@ export default function Employees() {
     const commissionData = getCommissionData(emp.id, new Date());
     return sum + commissionData.totalCommission;
   }, 0);
-  const averageCommissionRate = employees.reduce((sum, emp) => sum + emp.defaultCommission, 0) / employees.length;
+  const averageCommissionRate = employees.length > 0 
+    ? employees.reduce((sum, emp) => sum + emp.defaultCommission, 0) / employees.length 
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -291,7 +306,10 @@ export default function Employees() {
             <div>
               <p className="text-sm font-medium text-gray-600">Rata-rata Rating</p>
               <p className="text-2xl font-bold text-gray-900">
-                {(employees.reduce((sum, emp) => sum + emp.averageRating, 0) / employees.length).toFixed(1)}
+                {employees.length > 0 
+                  ? (employees.reduce((sum, emp) => sum + emp.averageRating, 0) / employees.length).toFixed(1)
+                  : '0.0'
+                }
               </p>
             </div>
             <Star className="h-8 w-8 text-yellow-500" />

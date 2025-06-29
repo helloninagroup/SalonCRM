@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Minus, ShoppingCart, CreditCard, DollarSign, Receipt, User, Percent } from 'lucide-react';
 import InvoiceModal from '../components/InvoiceModal';
 
@@ -29,15 +29,6 @@ const clients = [
   { value: 'anna', label: 'Anna Johnson' },
 ];
 
-// Daftar karyawan dengan komisi default
-const employees = [
-  { id: 1, name: 'Sarah Johnson', position: 'Senior Stylist', defaultCommission: 12 },
-  { id: 2, name: 'Maria Santos', position: 'Hair Colorist', defaultCommission: 10 },
-  { id: 3, name: 'Jake Wilson', position: 'Barber', defaultCommission: 8 },
-  { id: 4, name: 'Lisa Chen', position: 'Nail Technician', defaultCommission: 10 },
-  { id: 5, name: 'Ahmad Rahman', position: 'Junior Stylist', defaultCommission: 6 },
-];
-
 interface CartItem {
   id: string;
   name: string;
@@ -46,13 +37,92 @@ interface CartItem {
   type: 'service' | 'product';
 }
 
+interface Employee {
+  id: number;
+  name: string;
+  position: string;
+  defaultCommission: number;
+  status: 'aktif' | 'tidak_aktif';
+}
+
+// Fungsi untuk mengambil data karyawan dari localStorage
+const getEmployeesFromStorage = (): Employee[] => {
+  try {
+    const stored = localStorage.getItem('salon_employees');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Error loading employees from storage:', error);
+  }
+  
+  // Data default jika tidak ada di localStorage
+  return [
+    { id: 1, name: 'Sarah Johnson', position: 'Senior Stylist', defaultCommission: 12, status: 'aktif' },
+    { id: 2, name: 'Maria Santos', position: 'Hair Colorist', defaultCommission: 10, status: 'aktif' },
+    { id: 3, name: 'Jake Wilson', position: 'Barber', defaultCommission: 8, status: 'aktif' },
+    { id: 4, name: 'Lisa Chen', position: 'Nail Technician', defaultCommission: 10, status: 'aktif' },
+    { id: 5, name: 'Ahmad Rahman', position: 'Junior Stylist', defaultCommission: 6, status: 'aktif' },
+  ];
+};
+
+// Fungsi untuk menyimpan data karyawan ke localStorage
+const saveEmployeesToStorage = (employees: Employee[]) => {
+  try {
+    localStorage.setItem('salon_employees', JSON.stringify(employees));
+  } catch (error) {
+    console.error('Error saving employees to storage:', error);
+  }
+};
+
 export default function POS() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeTab, setActiveTab] = useState<'services' | 'products'>('services');
   const [selectedClient, setSelectedClient] = useState('');
-  const [selectedEmployee, setSelectedEmployee] = useState(employees[0].id.toString());
-  const [commissionRate, setCommissionRate] = useState(employees[0].defaultCommission);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [commissionRate, setCommissionRate] = useState(0);
   const [showInvoice, setShowInvoice] = useState(false);
+
+  // Load employees data saat komponen dimount
+  useEffect(() => {
+    const loadedEmployees = getEmployeesFromStorage();
+    const activeEmployees = loadedEmployees.filter(emp => emp.status === 'aktif');
+    setEmployees(activeEmployees);
+    
+    // Set karyawan pertama sebagai default jika ada
+    if (activeEmployees.length > 0) {
+      setSelectedEmployee(activeEmployees[0].id.toString());
+      setCommissionRate(activeEmployees[0].defaultCommission);
+    }
+  }, []);
+
+  // Listen untuk perubahan data karyawan dari halaman lain
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const loadedEmployees = getEmployeesFromStorage();
+      const activeEmployees = loadedEmployees.filter(emp => emp.status === 'aktif');
+      setEmployees(activeEmployees);
+      
+      // Jika karyawan yang dipilih tidak ada lagi, pilih yang pertama
+      const currentEmployee = activeEmployees.find(emp => emp.id.toString() === selectedEmployee);
+      if (!currentEmployee && activeEmployees.length > 0) {
+        setSelectedEmployee(activeEmployees[0].id.toString());
+        setCommissionRate(activeEmployees[0].defaultCommission);
+      }
+    };
+
+    // Listen untuk perubahan localStorage
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Listen untuk custom event saat data karyawan berubah
+    window.addEventListener('employeesUpdated', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('employeesUpdated', handleStorageChange);
+    };
+  }, [selectedEmployee]);
 
   const addToCart = (item: typeof services[0] | typeof products[0], type: 'service' | 'product') => {
     const cartItemId = `${type}-${item.id}`;
@@ -99,8 +169,41 @@ export default function POS() {
   const commissionAmount = (total * commissionRate) / 100;
 
   const handleCheckout = () => {
+    if (cart.length === 0) {
+      alert('Keranjang kosong. Tambahkan item untuk melakukan transaksi.');
+      return;
+    }
+
+    if (!selectedEmployee) {
+      alert('Pilih karyawan yang melayani untuk melanjutkan transaksi.');
+      return;
+    }
+
     const selectedEmp = employees.find(emp => emp.id.toString() === selectedEmployee);
     const clientName = getClientName();
+    
+    // Simpan transaksi untuk laporan komisi
+    const transaction = {
+      id: Date.now(),
+      employeeId: parseInt(selectedEmployee),
+      clientName,
+      services: cart.filter(item => item.type === 'service').map(item => item.name),
+      products: cart.filter(item => item.type === 'product').map(item => item.name),
+      total,
+      commission: commissionAmount,
+      commissionRate,
+      date: new Date().toISOString(),
+      items: cart
+    };
+
+    // Simpan ke localStorage untuk laporan
+    try {
+      const existingTransactions = JSON.parse(localStorage.getItem('salon_transactions') || '[]');
+      existingTransactions.push(transaction);
+      localStorage.setItem('salon_transactions', JSON.stringify(existingTransactions));
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+    }
     
     const transactionSummary = `
 Transaksi berhasil!
@@ -237,37 +340,51 @@ Komisi akan ditambahkan ke akun karyawan.
                 <User className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-blue-900">Karyawan yang Melayani</span>
               </div>
-              <select
-                value={selectedEmployee}
-                onChange={(e) => handleEmployeeChange(e.target.value)}
-                className="input text-sm"
-              >
-                {employees.map(employee => (
-                  <option key={employee.id} value={employee.id.toString()}>
-                    {employee.name} - {employee.position}
-                  </option>
-                ))}
-              </select>
               
-              {/* Commission Rate */}
-              <div className="mt-2 flex items-center justify-between">
-                <div className="flex items-center space-x-1">
-                  <Percent className="h-3 w-3 text-blue-600" />
-                  <span className="text-xs text-blue-700">Komisi:</span>
+              {employees.length === 0 ? (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-sm text-yellow-800">
+                    Belum ada karyawan aktif. Silakan tambahkan karyawan melalui menu "Karyawan".
+                  </p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="number"
-                    value={commissionRate}
-                    onChange={(e) => setCommissionRate(Math.max(0, Math.min(50, parseFloat(e.target.value) || 0)))}
-                    className="w-16 px-2 py-1 text-xs border border-blue-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                    min="0"
-                    max="50"
-                    step="0.5"
-                  />
-                  <span className="text-xs text-blue-700">%</span>
-                </div>
-              </div>
+              ) : (
+                <>
+                  <select
+                    value={selectedEmployee}
+                    onChange={(e) => handleEmployeeChange(e.target.value)}
+                    className="input text-sm"
+                  >
+                    <option value="">Pilih Karyawan</option>
+                    {employees.map(employee => (
+                      <option key={employee.id} value={employee.id.toString()}>
+                        {employee.name} - {employee.position}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  {/* Commission Rate */}
+                  {selectedEmployee && (
+                    <div className="mt-2 flex items-center justify-between">
+                      <div className="flex items-center space-x-1">
+                        <Percent className="h-3 w-3 text-blue-600" />
+                        <span className="text-xs text-blue-700">Komisi:</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="number"
+                          value={commissionRate}
+                          onChange={(e) => setCommissionRate(Math.max(0, Math.min(50, parseFloat(e.target.value) || 0)))}
+                          className="w-16 px-2 py-1 text-xs border border-blue-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          min="0"
+                          max="50"
+                          step="0.5"
+                        />
+                        <span className="text-xs text-blue-700">%</span>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             {cart.length === 0 ? (
@@ -324,18 +441,21 @@ Komisi akan ditambahkan ke akun karyawan.
                   </div>
                   
                   {/* Commission Display */}
-                  <div className="flex justify-between text-sm bg-green-50 p-2 rounded-md border border-green-200">
-                    <span className="text-green-700 font-medium">Komisi ({commissionRate}%):</span>
-                    <span className="font-bold text-green-800">
-                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(commissionAmount)}
-                    </span>
-                  </div>
+                  {selectedEmployee && commissionRate > 0 && (
+                    <div className="flex justify-between text-sm bg-green-50 p-2 rounded-md border border-green-200">
+                      <span className="text-green-700 font-medium">Komisi ({commissionRate}%):</span>
+                      <span className="font-bold text-green-800">
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(commissionAmount)}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-6 space-y-3">
                   <button
                     onClick={handleCheckout}
                     className="w-full btn-primary"
+                    disabled={!selectedEmployee || employees.length === 0}
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
                     Proses Pembayaran
