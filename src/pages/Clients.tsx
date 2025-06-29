@@ -206,41 +206,41 @@ export default function Clients() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Klien</h1>
+    <div className="space-y-4 lg:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Klien</h1>
         <button 
           onClick={() => setShowAddModal(true)}
-          className="btn-primary"
+          className="btn-primary w-full sm:w-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
           Tambah Klien
         </button>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex items-center space-x-4">
-        <div className="relative flex-1 max-w-md">
+      {/* Search and Filters - Mobile Optimized */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
             placeholder="Cari klien..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="input pl-10"
+            className="input pl-10 w-full"
           />
         </div>
-        <button className="btn-secondary">
+        <button className="btn-secondary w-full sm:w-auto">
           <Filter className="h-4 w-4 mr-2" />
           Filter
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Client List */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        {/* Client List - Mobile Optimized */}
         <div className="lg:col-span-2">
-          <div className="card">
-            <div className="space-y-4">
+          <div className="card p-4 lg:p-6">
+            <div className="space-y-3 lg:space-y-4">
               {filteredClients.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <p>Tidak ada klien yang ditemukan</p>
@@ -250,44 +250,44 @@ export default function Clients() {
                   <div
                     key={client.id}
                     onClick={() => setSelectedClient(client)}
-                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="p-3 lg:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="h-12 w-12 bg-primary-100 rounded-full flex items-center justify-center">
-                          <span className="text-lg font-semibold text-primary-700">
+                      <div className="flex items-center space-x-3 lg:space-x-4 flex-1 min-w-0">
+                        <div className="h-10 w-10 lg:h-12 lg:w-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm lg:text-lg font-semibold text-primary-700">
                             {client.name.split(' ').map(n => n[0]).join('')}
                           </span>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{client.name}</h3>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600">
-                            <span className="flex items-center">
-                              <Mail className="h-3 w-3 mr-1" />
-                              {client.email}
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-gray-900 text-sm lg:text-base truncate">{client.name}</h3>
+                          <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-4 text-xs lg:text-sm text-gray-600 space-y-1 lg:space-y-0">
+                            <span className="flex items-center truncate">
+                              <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">{client.email}</span>
                             </span>
                             <span className="flex items-center">
-                              <Phone className="h-3 w-3 mr-1" />
+                              <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
                               {client.phone}
                             </span>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 ml-2">
                         <div className="text-right">
                           <div className="flex items-center space-x-1 mb-1">
                             {Array.from({ length: 5 }, (_, i) => (
                               <Star
                                 key={i}
-                                className={`h-4 w-4 ${
+                                className={`h-3 w-3 lg:h-4 lg:w-4 ${
                                   i < client.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
                                 }`}
                               />
                             ))}
                           </div>
-                          <p className="text-sm text-gray-600">{client.totalVisits} kunjungan</p>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-xs lg:text-sm text-gray-600">{client.totalVisits} kunjungan</p>
+                          <p className="text-xs lg:text-sm font-medium text-gray-900">
                             {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(client.totalSpent)}
                           </p>
                         </div>
@@ -297,10 +297,10 @@ export default function Clients() {
                             e.stopPropagation();
                             handleDeleteClient(client.id);
                           }}
-                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
+                          className="p-1.5 lg:p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md"
                           title="Hapus Klien"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 lg:h-4 lg:w-4" />
                         </button>
                       </div>
                     </div>
@@ -311,22 +311,22 @@ export default function Clients() {
           </div>
         </div>
 
-        {/* Client Details */}
+        {/* Client Details - Mobile Optimized */}
         <div className="lg:col-span-1">
           {selectedClient ? (
-            <div className="card">
-              <div className="text-center mb-6">
-                <div className="h-20 w-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-primary-700">
+            <div className="card p-4 lg:p-6">
+              <div className="text-center mb-4 lg:mb-6">
+                <div className="h-16 w-16 lg:h-20 lg:w-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-xl lg:text-2xl font-bold text-primary-700">
                     {selectedClient.name.split(' ').map(n => n[0]).join('')}
                   </span>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">{selectedClient.name}</h2>
+                <h2 className="text-lg lg:text-xl font-bold text-gray-900">{selectedClient.name}</h2>
                 <div className="flex items-center justify-center space-x-1 mt-2">
                   {Array.from({ length: 5 }, (_, i) => (
                     <Star
                       key={i}
-                      className={`h-4 w-4 ${
+                      className={`h-3 w-3 lg:h-4 lg:w-4 ${
                         i < selectedClient.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
                       }`}
                     />
@@ -338,23 +338,23 @@ export default function Clients() {
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Informasi Kontak</h3>
                   <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Mail className="h-4 w-4 mr-2" />
-                      {selectedClient.email}
+                    <div className="flex items-center text-xs lg:text-sm text-gray-600">
+                      <Mail className="h-3 w-3 lg:h-4 lg:w-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{selectedClient.email}</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Phone className="h-4 w-4 mr-2" />
+                    <div className="flex items-center text-xs lg:text-sm text-gray-600">
+                      <Phone className="h-3 w-3 lg:h-4 lg:w-4 mr-2 flex-shrink-0" />
                       {selectedClient.phone}
                     </div>
                     {selectedClient.address && (
-                      <div className="flex items-start text-sm text-gray-600">
-                        <Mail className="h-4 w-4 mr-2 mt-0.5" />
-                        {selectedClient.address}
+                      <div className="flex items-start text-xs lg:text-sm text-gray-600">
+                        <Mail className="h-3 w-3 lg:h-4 lg:w-4 mr-2 mt-0.5 flex-shrink-0" />
+                        <span>{selectedClient.address}</span>
                       </div>
                     )}
                     {selectedClient.emergencyContact && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Phone className="h-4 w-4 mr-2" />
+                      <div className="flex items-center text-xs lg:text-sm text-gray-600">
+                        <Phone className="h-3 w-3 lg:h-4 lg:w-4 mr-2 flex-shrink-0" />
                         Darurat: {selectedClient.emergencyContact}
                       </div>
                     )}
@@ -364,7 +364,7 @@ export default function Clients() {
                 {selectedClient.dateOfBirth && (
                   <div>
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs lg:text-sm text-gray-600">
                       {new Date(selectedClient.dateOfBirth).toLocaleDateString('id-ID', {
                         year: 'numeric',
                         month: 'long',
@@ -377,23 +377,23 @@ export default function Clients() {
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Riwayat Kunjungan</h3>
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs lg:text-sm">
                       <span className="text-gray-600">Total Kunjungan:</span>
                       <span className="font-medium">{selectedClient.totalVisits}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs lg:text-sm">
                       <span className="text-gray-600">Total Dibelanjakan:</span>
                       <span className="font-medium">
                         {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(selectedClient.totalSpent)}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs lg:text-sm">
                       <span className="text-gray-600">Kunjungan Terakhir:</span>
                       <span className="font-medium">
                         {new Date(selectedClient.lastVisit).toLocaleDateString('id-ID')}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs lg:text-sm">
                       <span className="text-gray-600">Penata Rambut Pilihan:</span>
                       <span className="font-medium">{selectedClient.preferredStylist}</span>
                     </div>
@@ -403,7 +403,7 @@ export default function Clients() {
                 {selectedClient.allergies && (
                   <div>
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Alergi & Sensitivitas</h3>
-                    <p className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                    <p className="text-xs lg:text-sm text-red-600 bg-red-50 p-3 rounded-md">
                       {selectedClient.allergies}
                     </p>
                   </div>
@@ -411,12 +411,12 @@ export default function Clients() {
 
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Catatan</h3>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                  <p className="text-xs lg:text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
                     {selectedClient.notes}
                   </p>
                 </div>
 
-                <div className="flex space-x-2 pt-4">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
                   <button className="btn-primary flex-1">
                     <Calendar className="h-4 w-4 mr-2" />
                     Buat Janji Temu
@@ -426,7 +426,7 @@ export default function Clients() {
               </div>
             </div>
           ) : (
-            <div className="card">
+            <div className="card p-4 lg:p-6">
               <div className="text-center text-gray-500">
                 <p>Pilih klien untuk melihat detail</p>
               </div>

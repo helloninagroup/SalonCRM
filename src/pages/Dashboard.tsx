@@ -37,10 +37,10 @@ const upcomingAppointments = [
 
 export default function Dashboard() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Dasbor</h1>
-        <div className="text-sm text-gray-500">
+    <div className="space-y-4 lg:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Dasbor</h1>
+        <div className="text-xs lg:text-sm text-gray-500">
           {new Date().toLocaleDateString('id-ID', { 
             weekday: 'long', 
             year: 'numeric', 
@@ -50,52 +50,70 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Grid - Mobile Responsive */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
         {stats.map((stat) => (
-          <div key={stat.name} className="card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                <p className={`text-sm ${
+          <div key={stat.name} className="card p-4 lg:p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex-1">
+                <p className="text-xs lg:text-sm font-medium text-gray-600 mb-1 lg:mb-0">{stat.name}</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
+                <p className={`text-xs lg:text-sm ${
                   stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
                 }`}>
                   {stat.change} dari kemarin
                 </p>
               </div>
-              <div className="h-12 w-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                <stat.icon className="h-6 w-6 text-primary-600" />
+              <div className="h-8 w-8 lg:h-12 lg:w-12 bg-primary-100 rounded-lg flex items-center justify-center mt-2 lg:mt-0 self-end lg:self-auto">
+                <stat.icon className="h-4 w-4 lg:h-6 lg:w-6 text-primary-600" />
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Revenue Chart */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Pendapatan Mingguan</h3>
-          <ResponsiveContainer width="100%" height={300}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        {/* Revenue Chart - Mobile Optimized */}
+        <div className="card p-4 lg:p-6">
+          <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">Pendapatan Mingguan</h3>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={revenueData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`} />
-              <Tooltip formatter={(value) => [new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(value)), 'Pendapatan']} />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                tick={{ fontSize: 12 }}
+              />
+              <Tooltip 
+                formatter={(value) => [new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(Number(value)), 'Pendapatan']}
+                labelStyle={{ fontSize: '12px' }}
+                contentStyle={{ fontSize: '12px' }}
+              />
               <Bar dataKey="revenue" fill="#0284c7" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Appointments Trend */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Tren Janji Temu</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        {/* Appointments Trend - Mobile Optimized */}
+        <div className="card p-4 lg:p-6">
+          <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">Tren Janji Temu</h3>
+          <ResponsiveContainer width="100%" height={250}>
             <LineChart data={appointmentData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
+              <XAxis 
+                dataKey="name"
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+              />
+              <Tooltip 
+                labelStyle={{ fontSize: '12px' }}
+                contentStyle={{ fontSize: '12px' }}
+              />
               <Line 
                 type="monotone" 
                 dataKey="appointments" 
@@ -108,29 +126,29 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Upcoming Appointments */}
-      <div className="card">
+      {/* Upcoming Appointments - Mobile Optimized */}
+      <div className="card p-4 lg:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Janji Temu Hari Ini</h3>
-          <Clock className="h-5 w-5 text-gray-400" />
+          <h3 className="text-base lg:text-lg font-semibold text-gray-900">Janji Temu Hari Ini</h3>
+          <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400" />
         </div>
         <div className="space-y-3">
           {upcomingAppointments.map((appointment) => (
             <div key={appointment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-primary-700">
+                <div className="h-8 w-8 lg:h-10 lg:w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                  <span className="text-xs lg:text-sm font-medium text-primary-700">
                     {appointment.client.split(' ').map(n => n[0]).join('')}
                   </span>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{appointment.client}</p>
-                  <p className="text-sm text-gray-600">{appointment.service}</p>
+                  <p className="font-medium text-gray-900 text-sm lg:text-base">{appointment.client}</p>
+                  <p className="text-xs lg:text-sm text-gray-600">{appointment.service}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-medium text-gray-900">{appointment.time}</p>
-                <p className="text-sm text-gray-600">dengan {appointment.stylist}</p>
+                <p className="font-medium text-gray-900 text-sm lg:text-base">{appointment.time}</p>
+                <p className="text-xs lg:text-sm text-gray-600">dengan {appointment.stylist}</p>
               </div>
             </div>
           ))}
